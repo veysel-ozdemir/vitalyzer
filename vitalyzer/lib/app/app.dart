@@ -15,7 +15,9 @@ class _VitalyzerAppState extends State<VitalyzerApp> {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(textTheme: GoogleFonts.youngSerifTextTheme()),
+      theme: ThemeData(
+        textTheme: GoogleFonts.youngSerifTextTheme(),
+      ),
       home: LandingPage(),
     );
   }
