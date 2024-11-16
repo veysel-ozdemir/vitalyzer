@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/presentation/page/login_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/util/extension.dart';
 
@@ -57,9 +58,7 @@ class _LandingPageState extends State<LandingPage> {
               Column(
                 children: [
                   ElevatedButton(
-                    onPressed: () async {
-                      return await Get.to(RegisterPage());
-                    },
+                    onPressed: () async => await Get.to(const RegisterPage()),
                     style: ButtonStyle(
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),
@@ -74,7 +73,7 @@ class _LandingPageState extends State<LandingPage> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async => await Get.to(const LoginPage()),
                     child: Text(
                       'Already have an account?',
                       style: TextStyle(

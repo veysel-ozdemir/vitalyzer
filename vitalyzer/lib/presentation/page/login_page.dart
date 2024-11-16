@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:vitalyzer/const/color_palette.dart';
-import 'package:vitalyzer/presentation/page/login_page.dart';
+import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/util/extension.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController _nameController = TextEditingController();
+class _LoginPageState extends State<LoginPage> {
+  bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-  bool _obscurePassword = true;
 
   void _toggleVisibility() {
     setState(() {
@@ -27,10 +24,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -63,47 +58,17 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             ),
-            const Spacer(flex: 1),
-            Padding(
-              padding: const EdgeInsets.all(25),
-              child: TextFormField(
-                controller: _nameController,
-                style: const TextStyle(
+            const Padding(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                'Welcome back!',
+                style: TextStyle(
                   color: ColorPalette.darkGreen,
-                ),
-                cursorColor: ColorPalette.green,
-                decoration: InputDecoration(
-                  hintText: 'Enter your full name',
-                  hintStyle: TextStyle(
-                    color: ColorPalette.green.withOpacity(0.75),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 0,
-                    horizontal: 10,
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: ColorPalette.green,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: ColorPalette.green,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
+                  fontSize: 25,
                 ),
               ),
             ),
+            const Spacer(flex: 1),
             Padding(
               padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
               child: TextFormField(
@@ -146,7 +111,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
+              padding: const EdgeInsets.only(left: 25, right: 25),
               child: TextFormField(
                 controller: _passwordController,
                 style: const TextStyle(
@@ -161,7 +126,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
                 decoration: InputDecoration(
-                  hintText: 'Create password',
+                  hintText: 'Enter password',
                   hintStyle: TextStyle(
                     color: ColorPalette.green.withOpacity(0.75),
                   ),
@@ -201,74 +166,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
-              child: TextFormField(
-                controller: _confirmPasswordController,
-                style: const TextStyle(
-                  color: ColorPalette.darkGreen,
-                ),
-                cursorColor: ColorPalette.green,
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  hintText: 'Confirm password',
-                  hintStyle: TextStyle(
-                    color: ColorPalette.green.withOpacity(0.75),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 0,
-                    horizontal: 10,
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: ColorPalette.green,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: ColorPalette.green,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            ElevatedButton(
+            TextButton(
               onPressed: () {},
-              style: const ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(Colors.white),
-                side: WidgetStatePropertyAll(
-                  BorderSide(
-                    color: ColorPalette.green,
-                    width: 2,
-                  ),
+              child: Text(
+                'Forgot the password?',
+                style: TextStyle(
+                  color: ColorPalette.green.withOpacity(0.75),
                 ),
-              ),
-              child: const Icon(
-                Icons.cloud_upload,
-                color: ColorPalette.green,
-                size: 30,
-              ),
-            ),
-            Text(
-              'Upload profile photo',
-              style: TextStyle(
-                color: ColorPalette.green.withOpacity(0.75),
               ),
             ),
             const Spacer(flex: 1),
@@ -290,12 +194,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: const Text('Illustration'),
               ),
             ),
+            const Spacer(flex: 1),
             Column(
               children: [
                 ElevatedButton(
-                  onPressed: () async {
-                    return await Get.to(const RegisterPage());
-                  },
+                  onPressed: () async {},
                   style: ButtonStyle(
                     backgroundColor:
                         const WidgetStatePropertyAll(ColorPalette.green),
@@ -303,16 +206,16 @@ class _RegisterPageState extends State<RegisterPage> {
                         Size.fromWidth(deviceSize.width * 0.5)),
                   ),
                   child: const Text(
-                    'Register',
+                    'Login',
                     style: TextStyle(
                       color: ColorPalette.beige,
                     ),
                   ),
                 ),
                 TextButton(
-                  onPressed: () async => Get.to(const LoginPage()),
+                  onPressed: () async => Get.to(const RegisterPage()),
                   child: Text(
-                    'Already have an account?',
+                    "Don't you have an account?",
                     style: TextStyle(
                       color: ColorPalette.green.withOpacity(0.75),
                     ),
