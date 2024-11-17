@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/login_page.dart';
 import 'package:vitalyzer/util/extension.dart';
 
@@ -293,9 +294,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Column(
               children: [
                 ElevatedButton(
-                  onPressed: () async {
-                    return await Get.to(const RegisterPage());
-                  },
+                  onPressed: () async => await Get.offAll(const HomePage()),
                   style: ButtonStyle(
                     backgroundColor:
                         const WidgetStatePropertyAll(ColorPalette.green),
@@ -310,7 +309,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () async => Get.to(const LoginPage()),
+                  onPressed: () async => await Get.to(const LoginPage()),
                   child: Text(
                     'Already have an account?',
                     style: TextStyle(

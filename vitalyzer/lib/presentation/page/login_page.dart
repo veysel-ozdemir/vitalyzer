@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/util/extension.dart';
 
@@ -198,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
             Column(
               children: [
                 ElevatedButton(
-                  onPressed: () async {},
+                  onPressed: () async => await Get.offAll(const HomePage()),
                   style: ButtonStyle(
                     backgroundColor:
                         const WidgetStatePropertyAll(ColorPalette.green),
@@ -213,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () async => Get.to(const RegisterPage()),
+                  onPressed: () async => await Get.to(const RegisterPage()),
                   child: Text(
                     "Don't you have an account?",
                     style: TextStyle(
