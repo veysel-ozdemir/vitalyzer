@@ -294,7 +294,8 @@ class _RegisterPageState extends State<RegisterPage> {
             Column(
               children: [
                 ElevatedButton(
-                  onPressed: () async => await Get.offAll(const HomePage()),
+                  onPressed: () async =>
+                      await Get.offAll(() => const HomePage()),
                   style: ButtonStyle(
                     backgroundColor:
                         const WidgetStatePropertyAll(ColorPalette.green),
@@ -309,7 +310,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () async => await Get.to(const LoginPage()),
+                  onPressed: () async => await Get.off(() => const LoginPage()),
                   child: Text(
                     'Already have an account?',
                     style: TextStyle(

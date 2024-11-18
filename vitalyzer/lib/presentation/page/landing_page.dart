@@ -3,6 +3,7 @@ import 'package:get/route_manager.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/presentation/page/login_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
+import 'package:vitalyzer/presentation/page/user_info_fill_page.dart';
 import 'package:vitalyzer/util/extension.dart';
 
 class LandingPage extends StatefulWidget {
@@ -13,6 +14,8 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
+  final bool _userHasFilled = false;
+
   @override
   Widget build(BuildContext context) {
     final deviceSize = context.deviceSize;
@@ -58,7 +61,9 @@ class _LandingPageState extends State<LandingPage> {
               Column(
                 children: [
                   ElevatedButton(
-                    onPressed: () async => await Get.to(const RegisterPage()),
+                    onPressed: () async => _userHasFilled
+                        ? await Get.to(() => const RegisterPage())
+                        : await Get.to(() => const UserInfoFillPage()),
                     style: ButtonStyle(
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),
@@ -73,7 +78,8 @@ class _LandingPageState extends State<LandingPage> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () async => await Get.to(const LoginPage()),
+                    onPressed: () async =>
+                        await Get.to(() => const LoginPage()),
                     child: Text(
                       'Already have an account?',
                       style: TextStyle(
