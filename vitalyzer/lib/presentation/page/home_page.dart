@@ -14,7 +14,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final deviceSize = context.deviceSize;
-    final items = List.generate(18, (index) => 'index $index');
+    final items = List.generate(8, (index) => 'index $index');
 
     return Scaffold(
       backgroundColor: ColorPalette.beige,
@@ -45,24 +45,28 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                Container(
-                  alignment: Alignment.center,
+                InkWell(
+                  onTap: () {},
                   child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: ColorPalette.darkGreen,
-                        width: 3,
+                    alignment: Alignment.center,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: ColorPalette.darkGreen,
+                          width: 3,
+                        ),
                       ),
-                    ),
-                    child: FlutterLogo(
-                      size: deviceSize.height * 0.05,
+                      child: FlutterLogo(
+                        size: deviceSize.height * 0.05,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
+            const Spacer(flex: 1),
             Padding(
               padding: const EdgeInsets.only(top: 25, bottom: 25),
               child: Row(
@@ -112,7 +116,6 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            const Spacer(flex: 1),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -161,6 +164,84 @@ class _HomePageState extends State<HomePage> {
                   itemCount: items.length,
                   itemBuilder: (context, index) => GridItem(index: index),
                 ),
+              ),
+            ),
+            const Spacer(flex: 1),
+            Padding(
+              padding: const EdgeInsets.only(top: 25, bottom: 25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(10),
+                      height: deviceSize.height * 0.075,
+                      width: deviceSize.height * 0.075,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: ColorPalette.darkGreen,
+                          width: 3,
+                        ),
+                      ),
+                      child: const Text(
+                        '1',
+                        style: TextStyle(
+                          color: ColorPalette.darkGreen,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(10),
+                      height: deviceSize.height * 0.075,
+                      width: deviceSize.height * 0.075,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: ColorPalette.darkGreen,
+                          width: 3,
+                        ),
+                      ),
+                      child: const Text(
+                        '2',
+                        style: TextStyle(
+                          color: ColorPalette.darkGreen,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(10),
+                      height: deviceSize.height * 0.075,
+                      width: deviceSize.height * 0.075,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: ColorPalette.darkGreen,
+                          width: 3,
+                        ),
+                      ),
+                      child: const Text(
+                        '3',
+                        style: TextStyle(
+                          color: ColorPalette.darkGreen,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             )
           ],
