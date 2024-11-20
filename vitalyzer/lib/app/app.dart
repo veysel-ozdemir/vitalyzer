@@ -18,7 +18,7 @@ class _VitalyzerAppState extends State<VitalyzerApp> {
       theme: ThemeData(
         textTheme: GoogleFonts.youngSerifTextTheme(),
       ),
-      home: LandingPage(),
+      home: const LandingPage(),
     );
   }
 }

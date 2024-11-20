@@ -4,8 +4,18 @@ import 'package:vitalyzer/const/color_palette.dart';
 class UserInfoContainer extends StatefulWidget {
   final String text;
   final IconData icon;
+  final Object? buttonText;
+  final String? unit;
+  final void Function()? onTap;
 
-  const UserInfoContainer({super.key, required this.text, required this.icon});
+  const UserInfoContainer({
+    super.key,
+    required this.text,
+    required this.icon,
+    required this.buttonText,
+    required this.onTap,
+    required this.unit,
+  });
 
   @override
   State<UserInfoContainer> createState() => _UserInfoContainerState();
@@ -49,17 +59,22 @@ class _UserInfoContainerState extends State<UserInfoContainer> {
               ],
             ),
             InkWell(
-              onTap: () {},
-              child: const Row(
+              onTap: widget.onTap,
+              child: Row(
                 children: [
                   Text(
-                    'Select',
-                    style: TextStyle(
+                    widget.buttonText != null
+                        ? (widget.unit != null
+                                ? "${widget.buttonText.toString()} ${widget.unit}"
+                                : widget.buttonText)
+                            .toString()
+                        : 'Select',
+                    style: const TextStyle(
                       color: ColorPalette.green,
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Icon(
+                  const SizedBox(width: 10),
+                  const Icon(
                     Icons.arrow_forward_ios,
                     color: ColorPalette.green,
                     size: 16,
