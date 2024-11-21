@@ -13,8 +13,8 @@ class UserInfoContainer extends StatefulWidget {
     required this.text,
     required this.icon,
     required this.buttonText,
-    required this.onTap,
     required this.unit,
+    required this.onTap,
   });
 
   @override
