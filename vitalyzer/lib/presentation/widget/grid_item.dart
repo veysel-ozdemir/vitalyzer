@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vitalyzer/const/color_palette.dart';
 
 class GridItem extends StatefulWidget {
   final int index;
@@ -24,16 +23,7 @@ class _GridItemState extends State<GridItem> {
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 200), // Smooth transition
         opacity: isPressed ? 1.0 : 0.5, // Increase opacity if pressed
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: ColorPalette.darkGreen,
-              width: 3,
-            ),
-          ),
-        ),
+        child: Image.asset('assets/illustrations/water-bottle.png'),
       ),
     );
   }

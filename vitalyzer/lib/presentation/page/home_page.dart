@@ -138,15 +138,20 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    '...',
-                    style: TextStyle(
-                      color: ColorPalette.darkGreen.withOpacity(0.75),
-                      fontSize: 20,
+                Column(
+                  children: [
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        '...',
+                        style: TextStyle(
+                          color: ColorPalette.darkGreen.withOpacity(0.75),
+                          fontSize: 20,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 20)
+                  ],
                 ),
               ],
             ),
@@ -172,75 +177,39 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  const Spacer(flex: 1),
                   InkWell(
                     onTap: () {},
                     child: Container(
                       alignment: Alignment.center,
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(5),
                       height: deviceSize.height * 0.075,
                       width: deviceSize.height * 0.075,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: ColorPalette.darkGreen,
-                          width: 3,
-                        ),
-                      ),
-                      child: const Text(
-                        '1',
-                        style: TextStyle(
-                          color: ColorPalette.darkGreen,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                      child: Image.asset('assets/illustrations/checklist.png'),
                     ),
                   ),
+                  const Spacer(flex: 3),
                   InkWell(
                     onTap: () {},
                     child: Container(
                       alignment: Alignment.center,
-                      padding: const EdgeInsets.all(10),
                       height: deviceSize.height * 0.075,
                       width: deviceSize.height * 0.075,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: ColorPalette.darkGreen,
-                          width: 3,
-                        ),
-                      ),
-                      child: const Text(
-                        '2',
-                        style: TextStyle(
-                          color: ColorPalette.darkGreen,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                      child: Image.asset('assets/illustrations/camera.png'),
                     ),
                   ),
+                  const Spacer(flex: 3),
                   InkWell(
                     onTap: () {},
                     child: Container(
                       alignment: Alignment.center,
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(5),
                       height: deviceSize.height * 0.075,
                       width: deviceSize.height * 0.075,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: ColorPalette.darkGreen,
-                          width: 3,
-                        ),
-                      ),
-                      child: const Text(
-                        '3',
-                        style: TextStyle(
-                          color: ColorPalette.darkGreen,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                      child: Image.asset('assets/illustrations/analytics.png'),
                     ),
                   ),
+                  const Spacer(flex: 1),
                 ],
               ),
             )

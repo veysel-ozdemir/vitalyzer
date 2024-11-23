@@ -26,3 +26,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - "assets/illustrations/analytics.png"
+    - "assets/illustrations/camera.png"
+    - "assets/illustrations/checklist.png"
+    - "assets/illustrations/water-bottle.png"
