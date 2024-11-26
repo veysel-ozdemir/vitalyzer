@@ -201,7 +201,8 @@ class _LoginPageState extends State<LoginPage> {
             Column(
               children: [
                 ElevatedButton(
-                  onPressed: () async => await Get.offAll(const HomePage()),
+                  onPressed: () async =>
+                      await Get.offAll(() => const HomePage()),
                   style: ButtonStyle(
                     backgroundColor:
                         const WidgetStatePropertyAll(ColorPalette.green),
