@@ -18,10 +18,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _loadData(); // Load persisted value when page initializes
+    _loadSharedPrefs(); // Load persisted value when page initializes
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       drankWaterBottle = prefs.getInt('drankWaterBottle') ?? 0; // Default to 0

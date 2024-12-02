@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
@@ -14,7 +15,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final bool _userHasFilled = false;
+  bool userHasFilled = false;
   bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -22,6 +23,19 @@ class _LoginPageState extends State<LoginPage> {
   void _toggleVisibility() {
     setState(() {
       _obscurePassword = !_obscurePassword;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSharedPrefs();
+  }
+
+  Future<void> _loadSharedPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userHasFilled = prefs.getString('userHasFilledInfoForm') == 'true';
     });
   }
 
@@ -217,9 +231,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () async => _userHasFilled
-                      ? await Get.off(() => const RegisterPage())
-                      : await Get.off(() => const UserInfoFillPage()),
+                  onPressed: userHasFilled
+                      ? () async => await Get.off(() => const RegisterPage())
+                      : () async =>
+                          await Get.off(() => const UserInfoFillPage()),
                   child: Text(
                     "Don't you have an account?",
                     style: TextStyle(

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/presentation/widget/user_info_container.dart';
@@ -19,6 +20,17 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
   int? selectedHeight;
   double? selectedWeight;
   bool isSelectionComplete = false;
+  late SharedPreferences prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSharedPrefs();
+  }
+
+  Future<void> _loadSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+  }
 
   void updateSelectionStatus() {
     setState(() {
@@ -165,7 +177,10 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
               padding: const EdgeInsets.only(top: 25),
               child: ElevatedButton(
                 onPressed: isSelectionComplete
-                    ? () async => await Get.off(() => const RegisterPage())
+                    ? () async {
+                        await prefs.setString('userHasFilledInfoForm', 'true');
+                        return await Get.off(() => const RegisterPage());
+                      }
                     : null,
                 style: ButtonStyle(
                   fixedSize: WidgetStatePropertyAll(

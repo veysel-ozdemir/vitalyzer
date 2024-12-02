@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/presentation/page/login_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
@@ -14,7 +15,24 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
-  final bool _userHasFilled = false;
+  bool userHasFilled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSharedPrefs();
+  }
+
+  Future<void> _loadSharedPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // todo: this line is for testing, delete it later
+    await prefs.clear();
+
+    setState(() {
+      userHasFilled = prefs.getString('userHasFilledInfoForm') == 'true';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +79,10 @@ class _LandingPageState extends State<LandingPage> {
               Column(
                 children: [
                   ElevatedButton(
-                    onPressed: () async => _userHasFilled
-                        ? await Get.to(() => const RegisterPage())
-                        : await Get.to(() => const UserInfoFillPage()),
+                    onPressed: userHasFilled
+                        ? () async => await Get.to(() => const RegisterPage())
+                        : () async =>
+                            await Get.to(() => const UserInfoFillPage()),
                     style: ButtonStyle(
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),
