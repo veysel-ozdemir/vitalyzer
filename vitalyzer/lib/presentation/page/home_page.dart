@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
@@ -32,8 +33,7 @@ class _HomePageState extends State<HomePage> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       dailyWaterLimit = prefs.getDouble('dailyWaterLimit');
-      waterBottleItemCount =
-          8; // todo: assign to this later => (dailyWaterLimit / waterBottleCapacity).toInt();
+      waterBottleItemCount = (dailyWaterLimit! / waterBottleCapacity).toInt();
       gainedCalories = prefs.getInt('gainedCalories');
       dailyCalorieLimit = prefs.getInt('dailyCalorieLimit');
       drankWaterBottle = prefs.getInt('drankWaterBottle')!;
@@ -41,13 +41,12 @@ class _HomePageState extends State<HomePage> {
       final savedStates = prefs.getStringList('waterBottleItemStates');
       waterBottleItemStates = savedStates != null
           ? savedStates.map((e) => e == 'true').toList()
-          : List.filled(waterBottleItemCount, false);
+          : List.generate(waterBottleItemCount, (_) => false);
     });
   }
 
-  Future<void> _saveData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('drankWaterBottle', drankWaterBottle); // Persist value
+  Future<void> _saveWaterData() async {
+    await prefs.setInt('drankWaterBottle', drankWaterBottle);
     await prefs.setStringList('waterBottleItemStates',
         waterBottleItemStates.map((e) => e.toString()).toList());
   }
@@ -60,15 +59,20 @@ class _HomePageState extends State<HomePage> {
         drankWaterBottle--;
       }
       waterBottleItemStates[index] = isPressed; // Update state for this item
-      _saveData(); // Save updated value
+      _saveWaterData(); // Save updated value
     });
+  }
+
+  Future<void> _updateWaterLimitData() async {
+    await prefs.setDouble('dailyWaterLimit', dailyWaterLimit!);
+    await prefs.setInt('drankWaterBottle', drankWaterBottle);
+    await prefs.setStringList('waterBottleItemStates',
+        waterBottleItemStates.map((e) => e.toString()).toList());
   }
 
   @override
   Widget build(BuildContext context) {
     final deviceSize = context.deviceSize;
-    final items =
-        List.generate(waterBottleItemCount, (index) => 'index $index');
 
     return Scaffold(
       backgroundColor: ColorPalette.beige,
@@ -197,7 +201,24 @@ class _HomePageState extends State<HomePage> {
                       Column(
                         children: [
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () => _openWaterCounterSettings(
+                              context: context,
+                              onWaterLimitUpdate: (waterLimit) async {
+                                setState(() {
+                                  drankWaterBottle = 0;
+                                  dailyWaterLimit = waterLimit;
+                                  waterBottleItemCount =
+                                      (dailyWaterLimit! / waterBottleCapacity)
+                                          .toInt();
+                                  waterBottleItemStates = List.generate(
+                                    waterBottleItemCount,
+                                    (_) => false,
+                                  );
+                                });
+
+                                await _updateWaterLimitData();
+                              },
+                            ),
                             child: Text(
                               '...',
                               style: TextStyle(
@@ -224,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                               2, // Space between items horizontally
                           mainAxisSpacing: 5, // Space between rows
                         ),
-                        itemCount: items.length,
+                        itemCount: waterBottleItemCount,
                         itemBuilder: (context, index) => GridItem(
                           index: index,
                           isPressed: waterBottleItemStates[index],
@@ -282,6 +303,228 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+    );
+  }
+
+  void _openWaterCounterSettings({
+    required BuildContext context,
+    required void Function(double) onWaterLimitUpdate,
+  }) {
+    const int minIntegerPart = 0;
+    const int maxIntegerPart = 4;
+    const int fractionPartRange = 5;
+
+    int initialIntegerPart = dailyWaterLimit!.floor();
+    int initialFractionPart = (dailyWaterLimit! * 10 % 10).toInt();
+
+    // Scroll controllers for the two pickers
+    FixedExtentScrollController integerPartController =
+        FixedExtentScrollController(
+      initialItem: initialIntegerPart - minIntegerPart,
+    );
+    FixedExtentScrollController fractionPartController =
+        FixedExtentScrollController(
+      initialItem: initialFractionPart,
+    );
+
+    final deviceSize = context.deviceSize;
+
+    double waterLimit = dailyWaterLimit!;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ColorPalette.beige,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        side: BorderSide(
+          color: ColorPalette.lightGreen,
+          width: 3,
+        ),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              padding: const EdgeInsets.all(25),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Daily Water Limit",
+                    style: TextStyle(
+                      color: ColorPalette.darkGreen,
+                      fontSize: 20,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 200,
+                    child: CupertinoTheme(
+                      data: CupertinoThemeData(
+                        textTheme: CupertinoTextThemeData(
+                          pickerTextStyle:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: ColorPalette.darkGreen,
+                                  ),
+                        ),
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Spacer(flex: 1),
+                              Expanded(
+                                child: CupertinoPicker(
+                                  scrollController: integerPartController,
+                                  itemExtent: 40,
+                                  selectionOverlay: Container(
+                                    decoration: BoxDecoration(
+                                      color: ColorPalette.lightGreen
+                                          .withOpacity(0.5),
+                                      border: const Border(
+                                        left: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                        top: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                        bottom: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                      ),
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(8),
+                                        bottomLeft: Radius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                  onSelectedItemChanged: (int index) {
+                                    setState(() {
+                                      initialIntegerPart =
+                                          index + minIntegerPart;
+                                      waterLimit = initialIntegerPart +
+                                          initialFractionPart / 10.0;
+                                    });
+                                  },
+                                  children: List.generate(
+                                    maxIntegerPart - minIntegerPart + 1,
+                                    (index) => Center(
+                                      child: Text(
+                                        "${index + minIntegerPart}",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: CupertinoPicker(
+                                  scrollController: fractionPartController,
+                                  itemExtent: 40,
+                                  selectionOverlay: Container(
+                                    decoration: BoxDecoration(
+                                      color: ColorPalette.lightGreen
+                                          .withOpacity(0.5),
+                                      border: const Border(
+                                        right: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                        top: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                        bottom: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                      ),
+                                      borderRadius: const BorderRadius.only(
+                                        topRight: Radius.circular(8),
+                                        bottomRight: Radius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                  onSelectedItemChanged: (int index) {
+                                    setState(() {
+                                      initialFractionPart =
+                                          index * fractionPartRange;
+                                      waterLimit = initialIntegerPart +
+                                          initialFractionPart / 10.0;
+                                    });
+                                  },
+                                  children: List.generate(
+                                    2,
+                                    (index) => Center(
+                                      child: Text(
+                                        "${index * fractionPartRange}",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Spacer(flex: 1),
+                            ],
+                          ),
+                          const Center(
+                            child: Text(
+                              '.',
+                              style: TextStyle(
+                                color: ColorPalette.darkGreen,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            right: deviceSize.width * 0.1,
+                            child: const Text(
+                              'L',
+                              style: TextStyle(
+                                color: ColorPalette.darkGreen,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  waterLimit != 0.0
+                      ? ElevatedButton(
+                          style: ButtonStyle(
+                            fixedSize: WidgetStatePropertyAll(
+                              Size.fromWidth(deviceSize.width * 0.5),
+                            ),
+                            backgroundColor: const WidgetStatePropertyAll(
+                                ColorPalette.green),
+                          ),
+                          onPressed: () {
+                            onWaterLimitUpdate(waterLimit); // Call the callback
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            'Select',
+                            style: TextStyle(color: ColorPalette.beige),
+                          ),
+                        )
+                      : const Text(
+                          "The limit can't be zero.",
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
