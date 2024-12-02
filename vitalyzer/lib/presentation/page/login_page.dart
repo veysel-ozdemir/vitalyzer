@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _loadSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      userHasFilled = prefs.getString('userHasFilledInfoForm') == 'true';
+      userHasFilled = prefs.getBool('userHasFilledInfoForm') ?? false;
     });
   }
 

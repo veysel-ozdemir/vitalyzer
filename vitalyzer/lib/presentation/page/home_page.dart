@@ -12,8 +12,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int drankWaterBottle = 0; // Count of bottles pressed
+  int waterBottleItemCount = 0;
+  final double waterBottleCapacity = 0.5;
+
+  double? dailyWaterLimit;
+  int? gainedCalories;
+  int? dailyCalorieLimit;
+  int drankWaterBottle = 0;
   List<bool> waterBottleItemStates = []; // Pressed states of items
+  late SharedPreferences prefs;
 
   @override
   void initState() {
@@ -22,15 +29,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadSharedPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     setState(() {
-      drankWaterBottle = prefs.getInt('drankWaterBottle') ?? 0; // Default to 0
+      dailyWaterLimit = prefs.getDouble('dailyWaterLimit');
+      waterBottleItemCount =
+          8; // todo: assign to this later => (dailyWaterLimit / waterBottleCapacity).toInt();
+      gainedCalories = prefs.getInt('gainedCalories');
+      dailyCalorieLimit = prefs.getInt('dailyCalorieLimit');
+      drankWaterBottle = prefs.getInt('drankWaterBottle')!;
 
-      // Default to 8 items if not found in SharedPreferences
       final savedStates = prefs.getStringList('waterBottleItemStates');
       waterBottleItemStates = savedStates != null
           ? savedStates.map((e) => e == 'true').toList()
-          : List.filled(8, false); // Match `items.length`
+          : List.filled(waterBottleItemCount, false);
     });
   }
 
@@ -56,7 +67,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final deviceSize = context.deviceSize;
-    final items = List.generate(8, (index) => 'index $index');
+    final items =
+        List.generate(waterBottleItemCount, (index) => 'index $index');
 
     return Scaffold(
       backgroundColor: ColorPalette.beige,
@@ -138,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             Text(
-                              '1.799 / 2.020\nkcal',
+                              '$gainedCalories / $dailyCalorieLimit\nkcal',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: ColorPalette.darkGreen.withOpacity(0.75),
@@ -174,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Text(
-                            "${drankWaterBottle * 0.5} / 4.0 L",
+                            "${drankWaterBottle * waterBottleCapacity} / $dailyWaterLimit L",
                             style: TextStyle(
                               color: ColorPalette.darkGreen.withOpacity(0.75),
                               fontSize: 14,

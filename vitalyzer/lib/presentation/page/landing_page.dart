@@ -30,7 +30,7 @@ class _LandingPageState extends State<LandingPage> {
     await prefs.clear();
 
     setState(() {
-      userHasFilled = prefs.getString('userHasFilledInfoForm') == 'true';
+      userHasFilled = prefs.getBool('userHasFilledInfoForm') ?? false;
     });
   }
 

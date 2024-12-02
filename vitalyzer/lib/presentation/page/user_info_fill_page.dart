@@ -19,6 +19,9 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
   int? selectedAge;
   int? selectedHeight;
   double? selectedWeight;
+  int? dailyCalorieLimit;
+  double? dailyWaterLimit;
+  double? bodyMassIndexLevel;
   bool isSelectionComplete = false;
   late SharedPreferences prefs;
 
@@ -37,6 +40,21 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     await prefs.setInt('userAge', selectedAge!);
     await prefs.setInt('userHeight', selectedHeight!);
     await prefs.setDouble('userWeight', selectedWeight!);
+    await prefs.setDouble(
+        'dailyWaterLimit',
+        dailyWaterLimit ??
+            4.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+    await prefs.setInt(
+        'dailyCalorieLimit',
+        dailyCalorieLimit ??
+            2020); // todo: get the value from AI tool and remove the conditional statement afterwards
+    await prefs.setDouble(
+        'bodyMassIndexLevel',
+        bodyMassIndexLevel ??
+            24.5); // todo: get the value from AI tool and remove the conditional statement afterwards
+    await prefs.setInt('gainedCalories', 0);
+    await prefs.setInt('drankWaterBottle', 0);
+    await prefs.setBool('userHasFilledInfoForm', true);
   }
 
   void updateSelectionStatus() {
@@ -186,7 +204,6 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                 onPressed: isSelectionComplete
                     ? () async {
                         _saveDataToSharedPrefs();
-                        await prefs.setString('userHasFilledInfoForm', 'true');
                         return await Get.off(() => const RegisterPage());
                       }
                     : null,
