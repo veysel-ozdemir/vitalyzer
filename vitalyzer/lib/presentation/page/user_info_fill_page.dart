@@ -32,6 +32,13 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     prefs = await SharedPreferences.getInstance();
   }
 
+  Future<void> _saveDataToSharedPrefs() async {
+    await prefs.setString('userSex', selectedSex!);
+    await prefs.setInt('userAge', selectedAge!);
+    await prefs.setInt('userHeight', selectedHeight!);
+    await prefs.setDouble('userWeight', selectedWeight!);
+  }
+
   void updateSelectionStatus() {
     setState(() {
       isSelectionComplete = (selectedSex != null &&
@@ -178,6 +185,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
               child: ElevatedButton(
                 onPressed: isSelectionComplete
                     ? () async {
+                        _saveDataToSharedPrefs();
                         await prefs.setString('userHasFilledInfoForm', 'true');
                         return await Get.off(() => const RegisterPage());
                       }
