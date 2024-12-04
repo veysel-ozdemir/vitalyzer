@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,10 +25,17 @@ class _HomePageState extends State<HomePage> {
   List<bool> waterBottleItemStates = []; // Pressed states of items
   late SharedPreferences prefs;
 
+  String greeting = '';
+  late Timer timer;
+
   @override
   void initState() {
     super.initState();
     _loadSharedPrefs(); // Load persisted value when page initializes
+    _updateGreeting();
+    timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      _updateGreeting();
+    });
   }
 
   Future<void> _loadSharedPrefs() async {
@@ -70,6 +79,36 @@ class _HomePageState extends State<HomePage> {
         waterBottleItemStates.map((e) => e.toString()).toList());
   }
 
+  void _updateGreeting() {
+    final now = DateTime.now();
+    final hour = now.hour;
+    String newGreeting;
+
+    if (hour >= 5 && hour < 12) {
+      newGreeting = 'Good Morning,';
+    } else if (hour == 12) {
+      newGreeting = 'Good Noon,';
+    } else if (hour > 12 && hour < 17) {
+      newGreeting = 'Good Afternoon,';
+    } else if (hour >= 17 && hour < 21) {
+      newGreeting = 'Good Evening,';
+    } else {
+      newGreeting = 'Good Night,';
+    }
+
+    if (newGreeting != greeting) {
+      setState(() {
+        greeting = newGreeting;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceSize = context.deviceSize;
@@ -90,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Good Morning,',
+                            greeting,
                             style: TextStyle(
                               color: ColorPalette.darkGreen.withOpacity(0.75),
                               fontSize: 20,
