@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/presentation/camera/camera_screen.dart';
 import 'package:vitalyzer/presentation/widget/grid_item.dart';
 import 'package:vitalyzer/util/extension.dart';
 
@@ -116,7 +118,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: ColorPalette.beige,
       body: waterBottleItemStates.isEmpty
-          ? const Center(child: CircularProgressIndicator()) // Show a loader
+          ? const Center(
+              child: CircularProgressIndicator(color: ColorPalette.lightGreen),
+            ) // Show a loader
           : Padding(
               padding: const EdgeInsets.only(
                   top: 50, bottom: 25, right: 25, left: 25),
@@ -314,7 +318,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const Spacer(flex: 3),
                         InkWell(
-                          onTap: () {},
+                          onTap: () async => await Get.to(() => CameraScreen()),
                           child: Container(
                             alignment: Alignment.center,
                             height: deviceSize.height * 0.075,

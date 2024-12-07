@@ -18,6 +18,8 @@ dependencies:
   google_fonts: ^6.2.1
   get: ^4.6.6
   shared_preferences: ^2.3.3
+  camera: ^0.11.0+2
+  image: ^4.3.0
 
 dev_dependencies:
   flutter_test:
