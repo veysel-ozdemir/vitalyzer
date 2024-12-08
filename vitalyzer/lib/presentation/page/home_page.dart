@@ -318,7 +318,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const Spacer(flex: 3),
                         InkWell(
-                          onTap: () async => await Get.to(() => CameraScreen()),
+                          onTap: () async =>
+                              await Get.to(() => const CameraScreen()),
                           child: Container(
                             alignment: Alignment.center,
                             height: deviceSize.height * 0.075,

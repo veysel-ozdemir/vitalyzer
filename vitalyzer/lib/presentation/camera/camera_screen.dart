@@ -1,27 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/controller/permission_controller.dart';
 import 'package:vitalyzer/controller/scan_controller.dart';
 import 'package:vitalyzer/presentation/camera/camera_viewer.dart';
 import 'package:vitalyzer/presentation/camera/capture_button.dart';
 import 'package:vitalyzer/presentation/camera/top_image_viewer.dart';
 
-class CameraScreen extends StatelessWidget {
-  final ScanController controller = Get.find<ScanController>();
+class CameraScreen extends StatefulWidget {
+  const CameraScreen({super.key});
 
-  CameraScreen({super.key});
+  @override
+  State<CameraScreen> createState() => _CameraScreenState();
+}
+
+class _CameraScreenState extends State<CameraScreen> {
+  final ScanController scanController = Get.find();
+  final PermissionController permissionController = Get.find();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermissions();
+  }
+
+  Future<void> _checkPermissions() async {
+    bool permissionsGranted =
+        await permissionController.checkCameraAndMicPermissions();
+
+    if (permissionsGranted) {
+      // Trigger camera initialization if permissions are granted
+      scanController.initCamera();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) => controller.clearImageList(),
-      child: const Stack(
-        alignment: Alignment.center,
-        children: [
-          CameraViewer(),
-          CaptureButton(),
-          TopImageViewer(),
-        ],
-      ),
+    return Obx(
+      () {
+        return (scanController.isInitialized == true)
+            ? PopScope(
+                onPopInvokedWithResult: (didPop, result) =>
+                    scanController.clearImageList(),
+                child: const Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CameraViewer(),
+                    CaptureButton(),
+                    TopImageViewer(),
+                  ],
+                ),
+              )
+            :
+            // Permissions not granted, dialog would have been shown
+            Scaffold(
+                backgroundColor: ColorPalette.beige,
+                appBar: AppBar(
+                  backgroundColor: ColorPalette.beige,
+                  foregroundColor: ColorPalette.green,
+                ),
+                body: Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Camera and Microphone permissions are required.',
+                        style: TextStyle(color: ColorPalette.green),
+                      ),
+                      const SizedBox(height: 30),
+                      TextButton(
+                        onPressed: () async =>
+                            await permissionController.openSettings(),
+                        child: const Text(
+                          'Go to settings',
+                          style: TextStyle(
+                            color: ColorPalette.green,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+      },
     );
   }
 }

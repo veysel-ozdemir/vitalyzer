@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image/image.dart' as img;
+import 'package:vitalyzer/controller/permission_controller.dart';
 
 class ScanController extends GetxController {
   late List<CameraDescription> _cameras;
@@ -14,6 +16,8 @@ class ScanController extends GetxController {
   CameraController get cameraController => _cameraController;
   bool get isInitialized => _isInitialized.value;
   List<Uint8List> get imageList => _imageList;
+
+  final PermissionController permissionController = Get.find();
 
   @override
   void dispose() {
@@ -34,30 +38,45 @@ class ScanController extends GetxController {
   }
 
   Future<void> initCamera() async {
-    _cameras = await availableCameras();
-    _cameraController = CameraController(
-      _cameras[0],
-      ResolutionPreset.high,
-      imageFormatGroup: ImageFormatGroup.bgra8888,
-    );
-    _cameraController.initialize().then((value) {
-      _isInitialized.value = true;
-      _cameraController.startImageStream((image) => _cameraImage = image);
-      _isInitialized.refresh();
-    }).catchError((Object e) async {
-      if (e is CameraException) {
-        // todo: deal with disabled permissions
-      }
-    });
-  }
+    try {
+      debugPrint('-- Initializing Camera --');
 
-  @override
-  void onInit() {
-    // automatically called when the controller is first created
-    if (!_isInitialized.value) {
-      initCamera();
+      // Explicitly check permissions
+      bool permissionsGranted =
+          await permissionController.checkCameraAndMicPermissions();
+
+      debugPrint('-- Permissions Granted: $permissionsGranted --');
+
+      if (permissionsGranted) {
+        _cameras = await availableCameras();
+
+        if (_cameras.isEmpty) {
+          throw 'No cameras available';
+        }
+
+        _cameraController = CameraController(
+          _cameras[0],
+          ResolutionPreset.high,
+          imageFormatGroup: ImageFormatGroup.bgra8888,
+        );
+
+        await _cameraController.initialize();
+        _isInitialized.value = true;
+        _cameraController.startImageStream((image) => _cameraImage = image);
+        _isInitialized.refresh();
+
+        debugPrint('-- Camera Initialized Successfully --');
+      } else {
+        _isInitialized.value = false;
+        _isInitialized.refresh();
+        debugPrint(
+            '-- Camera Initialization Failed: Permissions Not Granted --');
+      }
+    } catch (e) {
+      debugPrint('-- Camera Initialization Error: $e --');
+      _isInitialized.value = false;
+      _isInitialized.refresh();
     }
-    super.onInit();
   }
 
   void capture() {
