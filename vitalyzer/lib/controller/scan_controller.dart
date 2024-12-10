@@ -18,6 +18,7 @@ class ScanController extends GetxController {
   List<Uint8List> get imageList => _imageList;
 
   final PermissionController permissionController = Get.find();
+  RxBool isLoading = true.obs;
 
   @override
   void dispose() {
@@ -40,6 +41,8 @@ class ScanController extends GetxController {
   Future<void> initCamera() async {
     try {
       debugPrint('-- Initializing Camera --');
+
+      isLoading.value = true;
 
       // Explicitly check permissions
       bool permissionsGranted =
@@ -76,6 +79,8 @@ class ScanController extends GetxController {
       debugPrint('-- Camera Initialization Error: $e --');
       _isInitialized.value = false;
       _isInitialized.refresh();
+    } finally {
+      isLoading.value = false;
     }
   }
 

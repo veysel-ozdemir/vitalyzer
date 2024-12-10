@@ -38,6 +38,15 @@ class _CameraScreenState extends State<CameraScreen> {
   Widget build(BuildContext context) {
     return Obx(
       () {
+        if (scanController.isLoading.value) {
+          // Show loading indicator while initializing
+          return const Scaffold(
+            backgroundColor: ColorPalette.beige,
+            body: Center(
+              child: CircularProgressIndicator(color: ColorPalette.lightGreen),
+            ),
+          );
+        }
         return (scanController.isInitialized == true)
             ? PopScope(
                 onPopInvokedWithResult: (didPop, result) =>
