@@ -5,10 +5,26 @@ import 'package:permission_handler/permission_handler.dart';
 class PermissionController extends GetxController {
   final RxBool _isCameraPermissionGranted = RxBool(false);
   final RxBool _isMicrophonePermissionGranted = RxBool(false);
+  final RxBool _isPhotoLibraryPermissionGranted = RxBool(false);
 
   bool get isCameraPermissionGranted => _isCameraPermissionGranted.value;
   bool get isMicrophonePermissionGranted =>
       _isMicrophonePermissionGranted.value;
+  bool get isPhotoLibraryPermissionGranted =>
+      _isPhotoLibraryPermissionGranted.value;
+
+  Future<bool> checkPhotoLibraryPermission() async {
+    debugPrint('-- Checking photo library permission status --');
+
+    var status = await Permission.photos.request();
+
+    _isPhotoLibraryPermissionGranted.value =
+        status.isGranted || status.isLimited;
+
+    debugPrint('-- Photo library permission status: $status --');
+
+    return _isPhotoLibraryPermissionGranted.value;
+  }
 
   Future<bool> checkCameraAndMicPermissions() async {
     debugPrint('-- Checking permissions --');

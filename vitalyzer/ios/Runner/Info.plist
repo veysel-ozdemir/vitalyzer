@@ -8,6 +8,9 @@
 	<!-- MICROPHONE PERMISSION -->
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access is required for the camera to work properly.</string>
+	<!-- MICROPHONE PERMISSION -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Access to the photo library is required to select and upload your profile photo.</string>
 	
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
