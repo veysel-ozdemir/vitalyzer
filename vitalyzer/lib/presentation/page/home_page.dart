@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/presentation/camera/camera_screen.dart';
+import 'package:vitalyzer/presentation/page/profile_page.dart';
 import 'package:vitalyzer/presentation/widget/grid_item.dart';
 import 'package:vitalyzer/util/extension.dart';
 
@@ -18,8 +19,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int waterBottleItemCount = 0;
-  final double waterBottleCapacity = 0.5;
 
+  double? waterBottleCapacity;
   double? dailyWaterLimit;
   int? gainedCalories;
   int? dailyCalorieLimit;
@@ -44,7 +45,8 @@ class _HomePageState extends State<HomePage> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       dailyWaterLimit = prefs.getDouble('dailyWaterLimit');
-      waterBottleItemCount = (dailyWaterLimit! / waterBottleCapacity).toInt();
+      waterBottleCapacity = prefs.getDouble('waterBottleCapacity');
+      waterBottleItemCount = (dailyWaterLimit! / waterBottleCapacity!).toInt();
       gainedCalories = prefs.getInt('gainedCalories');
       dailyCalorieLimit = prefs.getInt('dailyCalorieLimit');
       drankWaterBottle = prefs.getInt('drankWaterBottle')!;
@@ -149,7 +151,8 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () async =>
+                            await Get.to(() => const ProfilePage()),
                         child: Container(
                           alignment: Alignment.center,
                           child: Container(
@@ -233,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Text(
-                            "${drankWaterBottle * waterBottleCapacity} / $dailyWaterLimit L",
+                            "${drankWaterBottle * waterBottleCapacity!} / $dailyWaterLimit L",
                             style: TextStyle(
                               color: ColorPalette.darkGreen.withOpacity(0.75),
                               fontSize: 14,
@@ -251,7 +254,7 @@ class _HomePageState extends State<HomePage> {
                                   drankWaterBottle = 0;
                                   dailyWaterLimit = waterLimit;
                                   waterBottleItemCount =
-                                      (dailyWaterLimit! / waterBottleCapacity)
+                                      (dailyWaterLimit! / waterBottleCapacity!)
                                           .toInt();
                                   waterBottleItemStates = List.generate(
                                     waterBottleItemCount,
