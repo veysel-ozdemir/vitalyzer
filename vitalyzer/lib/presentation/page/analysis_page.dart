@@ -1,30 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
-import 'package:vitalyzer/presentation/page/register_page.dart';
+import 'package:vitalyzer/presentation/widget/bmi_gauge.dart';
 import 'package:vitalyzer/presentation/widget/user_info_container.dart';
-import 'package:vitalyzer/util/extension.dart';
 import 'package:vitalyzer/util/funtions.dart';
 
-class UserInfoFillPage extends StatefulWidget {
-  const UserInfoFillPage({super.key});
+class AnalysisPage extends StatefulWidget {
+  const AnalysisPage({super.key});
 
   @override
-  State<UserInfoFillPage> createState() => _UserInfoFillPageState();
+  State<AnalysisPage> createState() => _AnalysisPageState();
 }
 
-class _UserInfoFillPageState extends State<UserInfoFillPage> {
-  String? selectedSex;
-  int? selectedAge;
-  int? selectedHeight;
-  double? selectedWeight;
-  int? dailyCalorieLimit;
-  double? dailyWaterLimit;
-  double? bodyMassIndexLevel;
-  bool isSelectionComplete = false;
+class _AnalysisPageState extends State<AnalysisPage> {
+  bool _isLoading = true;
   late SharedPreferences prefs;
+  double? bodyMassIndexLevel;
 
   @override
   void initState() {
@@ -34,292 +27,98 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
 
   Future<void> _loadSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
-  }
-
-  Future<void> _saveDataToSharedPrefs() async {
-    await prefs.setString('userSex', selectedSex!);
-    await prefs.setInt('userAge', selectedAge!);
-    await prefs.setInt('userHeight', selectedHeight!);
-    await prefs.setDouble('userWeight', selectedWeight!);
-    await prefs.setDouble(
-        'dailyWaterLimit',
-        dailyWaterLimit ??
-            4.0); // todo: get the value from AI tool and remove the conditional statement afterwards
-    await prefs.setInt(
-        'dailyCalorieLimit',
-        dailyCalorieLimit ??
-            2020); // todo: get the value from AI tool and remove the conditional statement afterwards
-
-    bodyMassIndexLevel = calculateBodyMassIndex(
-      kgWeight: selectedWeight!,
-      cmHeight: selectedHeight!,
-    );
-    await prefs.setDouble('bodyMassIndexLevel', bodyMassIndexLevel!);
-    await prefs.setDouble('waterBottleCapacity', 0.5);
-    await prefs.setInt('gainedCalories', 0);
-    await prefs.setInt('drankWaterBottle', 0);
-    await prefs.setBool('userHasFilledInfoForm', true);
-  }
-
-  void updateSelectionStatus() {
     setState(() {
-      isSelectionComplete = (selectedSex != null &&
-          selectedAge != null &&
-          selectedHeight != null &&
-          selectedWeight != null);
+      bodyMassIndexLevel = prefs.getDouble('bodyMassIndexLevel');
+      _isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = context.deviceSize;
-
     return Scaffold(
       backgroundColor: ColorPalette.beige,
-      resizeToAvoidBottomInset: false,
-      body: Padding(
-        padding:
-            const EdgeInsets.only(top: 50, bottom: 25, right: 25, left: 25),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(
-                    Icons.arrow_back_ios,
-                    color: ColorPalette.darkGreen,
-                  ),
-                )
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: ColorPalette.lightGreen.withOpacity(0.5),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: ColorPalette.lightGreen,
-                      width: 3,
-                    ),
-                  ),
-                  child: const IconButton(
-                    onPressed: null,
-                    icon: Icon(
-                      Icons.person,
-                      color: ColorPalette.green,
-                      size: 40,
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 20, bottom: 10),
-                  child: Text(
-                    'About you',
-                    style: TextStyle(
-                      color: ColorPalette.darkGreen,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Text(
-                  'This information will be used to calculate your target calories, will be stored on your device and will not be shared with third parties.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: ColorPalette.darkGreen,
-                  ),
-                )
-              ],
-            ),
-            const Spacer(flex: 1),
-            UserInfoContainer(
-              text: 'Sex',
-              icon: Icons.people_alt,
-              buttonText: selectedSex,
-              unit: null,
-              onTap: () => _showSexSelector(
-                context: context,
-                onSexSelected: (sex) {
-                  setState(() {
-                    selectedSex = sex;
-                  });
-                  updateSelectionStatus();
-                },
-              ),
-            ),
-            UserInfoContainer(
-              text: 'Age',
-              icon: Icons.cake,
-              buttonText:
-                  selectedAge != null ? selectedAge.toString() : selectedAge,
-              unit: 'years',
-              onTap: () => _showAgeSelector(
-                context: context,
-                onAgeSelected: (age) {
-                  setState(() {
-                    selectedAge = age;
-                  });
-                  updateSelectionStatus();
-                },
-              ),
-            ),
-            UserInfoContainer(
-              text: 'Height',
-              icon: Icons.height,
-              buttonText: selectedHeight != null
-                  ? selectedHeight.toString()
-                  : selectedHeight,
-              unit: 'cm',
-              onTap: () => _showHeightSelector(
-                context: context,
-                onHeightSelected: (height) {
-                  setState(() {
-                    selectedHeight = height;
-                  });
-                  updateSelectionStatus();
-                },
-              ),
-            ),
-            UserInfoContainer(
-              text: 'Weight',
-              icon: Icons.scale,
-              buttonText: selectedWeight != null
-                  ? selectedWeight.toString()
-                  : selectedWeight,
-              unit: 'kg',
-              onTap: () => _showWeightSelector(
-                context: context,
-                onWeightSelected: (weight) {
-                  setState(() {
-                    selectedWeight = weight;
-                  });
-                  updateSelectionStatus();
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 25),
-              child: ElevatedButton(
-                onPressed: isSelectionComplete
-                    ? () async {
-                        _saveDataToSharedPrefs();
-                        return await Get.off(() => const RegisterPage());
-                      }
-                    : null,
-                style: ButtonStyle(
-                  fixedSize: WidgetStatePropertyAll(
-                      Size.fromWidth(deviceSize.width * 0.5)),
-                  backgroundColor: isSelectionComplete
-                      ? const WidgetStatePropertyAll(ColorPalette.green)
-                      : WidgetStatePropertyAll(
-                          ColorPalette.green.withOpacity(0.5)),
-                ),
-                child: const Text(
-                  'Continue',
-                  style: TextStyle(
-                    color: ColorPalette.beige,
-                  ),
-                ),
-              ),
+      appBar: AppBar(
+        backgroundColor: ColorPalette.beige,
+        foregroundColor: ColorPalette.green,
+      ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: ColorPalette.lightGreen),
             )
-          ],
-        ),
-      ),
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 25, right: 25, left: 25),
+              child: SizedBox(
+                height: Get.height,
+                width: Get.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    BMIGauge(bmiValue: bodyMassIndexLevel!),
+                    const Spacer(flex: 1),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: ColorPalette.lightGreen.withOpacity(0.5),
+                        border: Border.all(
+                            color: ColorPalette.lightGreen, width: 3),
+                      ),
+                      height: Get.height * 0.25,
+                      width: Get.width,
+                      child: const SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [],
+                        ),
+                      ),
+                    ),
+                    const Spacer(flex: 2),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 25, bottom: 25),
+                      child: ElevatedButton(
+                        onPressed: () => _openCalculator(),
+                        style: ButtonStyle(
+                          elevation: const WidgetStatePropertyAll(5),
+                          shape: WidgetStatePropertyAll(
+                            BeveledRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(
+                                  color: ColorPalette.green, width: 1.5),
+                            ),
+                          ),
+                          backgroundColor:
+                              const WidgetStatePropertyAll(ColorPalette.beige),
+                          fixedSize: WidgetStatePropertyAll(
+                            Size.fromWidth(Get.width * 0.5),
+                          ),
+                        ),
+                        child: const Text(
+                          'Custom Calculation',
+                          style: TextStyle(
+                            color: ColorPalette.green,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
-  void _showSexSelector({
-    required BuildContext context,
-    required void Function(String)
-        onSexSelected, // Pass a callback to update the state
-  }) {
-    String? sex = selectedSex;
+  void _openCalculator() {
+    double? selectedWeight;
+    int? selectedHeight;
+    bool isSelectionComplete = false;
+    bool showResult = false;
+    double? bmiValue;
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: ColorPalette.beige,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-        side: BorderSide(
-          color: ColorPalette.lightGreen,
-          width: 3,
-        ),
-      ),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Sex",
-                style: TextStyle(
-                  color: ColorPalette.darkGreen,
-                  fontSize: 20,
-                ),
-              ),
-              const SizedBox(height: 10),
-              ListTile(
-                tileColor: ColorPalette.lightGreen.withOpacity(0.5),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                      color: ColorPalette.lightGreen, width: 3),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                leading: const Icon(Icons.male, color: ColorPalette.green),
-                title: const Text(
-                  "Male",
-                  style: TextStyle(color: ColorPalette.darkGreen),
-                ),
-                onTap: () {
-                  sex = "Male";
-                  onSexSelected(sex!); // Call the callback
-                  Navigator.pop(context); // Close the bottom sheet
-                },
-              ),
-              const SizedBox(height: 5),
-              ListTile(
-                tileColor: ColorPalette.lightGreen.withOpacity(0.5),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                      color: ColorPalette.lightGreen, width: 3),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                leading: const Icon(Icons.female, color: ColorPalette.green),
-                title: const Text(
-                  "Female",
-                  style: TextStyle(color: ColorPalette.darkGreen),
-                ),
-                onTap: () {
-                  sex = "Female";
-                  onSexSelected(sex!); // Call the callback
-                  Navigator.pop(context); // Close the bottom sheet
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showAgeSelector({
-    required BuildContext context,
-    required void Function(int)
-        onAgeSelected, // Pass a callback to update the state
-  }) {
-    // Initialize scroll controller with previously selected age or default to 35
-    FixedExtentScrollController scrollController =
-        FixedExtentScrollController(initialItem: selectedAge ?? 35);
-    final deviceSize = context.deviceSize;
-
-    // Set initial age only if it hasn't been set before
-    int age = selectedAge ?? 35;
+    void updateSelectionStatus() {
+      setState(() {
+        isSelectionComplete =
+            (selectedHeight != null) && (selectedWeight != null);
+      });
+    }
 
     showModalBottomSheet(
       context: context,
@@ -336,100 +135,107 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
           builder: (BuildContext context, StateSetter setState) {
             return Container(
               padding: const EdgeInsets.all(25),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    "Age",
-                    style: TextStyle(
-                      color: ColorPalette.darkGreen,
-                      fontSize: 20,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height: 200,
-                    child: CupertinoTheme(
-                      data: CupertinoThemeData(
-                        textTheme: CupertinoTextThemeData(
-                          pickerTextStyle:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: ColorPalette.darkGreen,
-                                  ),
-                        ),
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          CupertinoPicker(
-                            scrollController: scrollController,
-                            itemExtent: 40,
-                            selectionOverlay: Container(
-                              decoration: BoxDecoration(
-                                color: ColorPalette.lightGreen.withOpacity(0.5),
-                                border: Border.all(
-                                  color: ColorPalette.lightGreen,
-                                  width: 3,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onSelectedItemChanged: (int index) {
-                              setState(() {
-                                age = index;
-                              });
-                            },
-                            children: List.generate(
-                              101,
-                              (index) => Center(
-                                child: Text(
-                                  index.toString(),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Fixed "years" text overlay
-                          Positioned(
-                            right: deviceSize.width * 0.25,
-                            child: const Text(
-                              'years',
-                              style: TextStyle(
-                                color: ColorPalette.darkGreen,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  age >= 18
-                      ? ElevatedButton(
-                          style: ButtonStyle(
-                            fixedSize: WidgetStatePropertyAll(
-                                Size.fromWidth(deviceSize.width * 0.5)),
-                            backgroundColor: const WidgetStatePropertyAll(
-                                ColorPalette.green),
-                          ),
-                          onPressed: () {
-                            onAgeSelected(age); // Call the callback
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            'Select',
-                            style: TextStyle(color: ColorPalette.beige),
-                          ),
-                        )
-                      : const Text(
-                          'You must be 18+ to use this app, as per market guidelines.',
+              width: Get.width,
+              child: showResult
+                  ? Column(
+                      children: [
+                        const Text(
+                          "Result",
                           style: TextStyle(
-                            color: Colors.red,
+                            color: ColorPalette.darkGreen,
+                            fontSize: 20,
                           ),
-                          textAlign: TextAlign.center,
+                        ),
+                        const Divider(
+                            color: ColorPalette.lightGreen, thickness: 2),
+                        const SizedBox(height: 15),
+                        BMIGauge(bmiValue: bmiValue!),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        const Text(
+                          "Custom Calculation",
+                          style: TextStyle(
+                            color: ColorPalette.darkGreen,
+                            fontSize: 20,
+                          ),
+                        ),
+                        const Divider(
+                            color: ColorPalette.lightGreen, thickness: 2),
+                        const SizedBox(height: 15),
+                        UserInfoContainer(
+                          text: 'Height',
+                          icon: Icons.height,
+                          buttonText: selectedHeight != null
+                              ? selectedHeight.toString()
+                              : selectedHeight,
+                          unit: 'cm',
+                          onTap: () => _showHeightSelector(
+                            selectedHeight: selectedHeight,
+                            context: context,
+                            onHeightSelected: (height) {
+                              setState(() {
+                                selectedHeight = height;
+                              });
+                              updateSelectionStatus();
+                            },
+                          ),
+                        ),
+                        UserInfoContainer(
+                          text: 'Weight',
+                          icon: Icons.scale,
+                          buttonText: selectedWeight != null
+                              ? selectedWeight.toString()
+                              : selectedWeight,
+                          unit: 'kg',
+                          onTap: () => _showWeightSelector(
+                            selectedWeight: selectedWeight,
+                            context: context,
+                            onWeightSelected: (weight) {
+                              setState(() {
+                                selectedWeight = weight;
+                              });
+                              updateSelectionStatus();
+                            },
+                          ),
+                        ),
+                        const Spacer(flex: 1),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 15),
+                          child: ElevatedButton(
+                            onPressed: isSelectionComplete
+                                ? () {
+                                    setState(
+                                      () {
+                                        bmiValue = calculateBodyMassIndex(
+                                          kgWeight: selectedWeight!,
+                                          cmHeight: selectedHeight!,
+                                        );
+                                        showResult = true;
+                                      },
+                                    );
+                                  }
+                                : null,
+                            style: ButtonStyle(
+                              fixedSize: WidgetStatePropertyAll(
+                                  Size.fromWidth(Get.width * 0.5)),
+                              backgroundColor: isSelectionComplete
+                                  ? const WidgetStatePropertyAll(
+                                      ColorPalette.green)
+                                  : WidgetStatePropertyAll(
+                                      ColorPalette.green.withOpacity(0.5)),
+                            ),
+                            child: const Text(
+                              'Calculate',
+                              style: TextStyle(
+                                color: ColorPalette.beige,
+                              ),
+                            ),
+                          ),
                         )
-                ],
-              ),
+                      ],
+                    ),
             );
           },
         );
@@ -438,6 +244,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
   }
 
   void _showHeightSelector({
+    required int? selectedHeight,
     required BuildContext context,
     required void Function(int)
         onHeightSelected, // Callback to update the state
@@ -450,7 +257,6 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     FixedExtentScrollController scrollController = FixedExtentScrollController(
       initialItem: (selectedHeight ?? 170) - minHeight,
     );
-    final deviceSize = context.deviceSize;
 
     // Set initial height only if it hasn't been set before
     int height = selectedHeight ?? 170;
@@ -525,7 +331,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                           ),
                           // Fixed "cm" text overlay
                           Positioned(
-                            right: deviceSize.width * 0.25,
+                            right: Get.width * 0.25,
                             child: const Text(
                               'cm',
                               style: TextStyle(
@@ -541,7 +347,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                   ElevatedButton(
                     style: ButtonStyle(
                       fixedSize: WidgetStatePropertyAll(
-                        Size.fromWidth(deviceSize.width * 0.5),
+                        Size.fromWidth(Get.width * 0.5),
                       ),
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),
@@ -565,6 +371,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
   }
 
   void _showWeightSelector({
+    required double? selectedWeight,
     required BuildContext context,
     required void Function(double)
         onWeightSelected, // Callback to update the state
@@ -588,8 +395,6 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
         FixedExtentScrollController(
       initialItem: initialFractionPart,
     );
-
-    final deviceSize = context.deviceSize;
 
     // Set initial weight only if it hasn't been set before
     double weight =
@@ -744,7 +549,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                             ),
                           ),
                           Positioned(
-                            right: deviceSize.width * 0.1,
+                            right: Get.width * 0.1,
                             child: const Text(
                               'kg',
                               style: TextStyle(
@@ -760,7 +565,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                   ElevatedButton(
                     style: ButtonStyle(
                       fixedSize: WidgetStatePropertyAll(
-                        Size.fromWidth(deviceSize.width * 0.5),
+                        Size.fromWidth(Get.width * 0.5),
                       ),
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),

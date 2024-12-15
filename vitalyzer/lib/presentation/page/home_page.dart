@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/presentation/camera/camera_screen.dart';
+import 'package:vitalyzer/presentation/page/analysis_page.dart';
 import 'package:vitalyzer/presentation/page/profile_page.dart';
 import 'package:vitalyzer/presentation/widget/grid_item.dart';
 import 'package:vitalyzer/util/extension.dart';
@@ -333,7 +334,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const Spacer(flex: 3),
                         InkWell(
-                          onTap: () {},
+                          onTap: () async => Get.to(() => const AnalysisPage()),
                           child: Container(
                             alignment: Alignment.center,
                             padding: const EdgeInsets.all(5),
