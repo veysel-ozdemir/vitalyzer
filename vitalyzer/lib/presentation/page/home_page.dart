@@ -9,6 +9,7 @@ import 'package:vitalyzer/presentation/camera/camera_screen.dart';
 import 'package:vitalyzer/presentation/page/analysis_page.dart';
 import 'package:vitalyzer/presentation/page/profile_page.dart';
 import 'package:vitalyzer/presentation/widget/grid_item.dart';
+import 'package:vitalyzer/presentation/widget/nutrient_pie_chart.dart';
 import 'package:vitalyzer/util/extension.dart';
 
 class HomePage extends StatefulWidget {
@@ -119,6 +120,7 @@ class _HomePageState extends State<HomePage> {
     final deviceSize = context.deviceSize;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: ColorPalette.beige,
       body: waterBottleItemStates.isEmpty
           ? const Center(
@@ -127,228 +129,260 @@ class _HomePageState extends State<HomePage> {
           : Padding(
               padding: const EdgeInsets.only(
                   top: 50, bottom: 25, right: 25, left: 25),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            greeting,
-                            style: TextStyle(
-                              color: ColorPalette.darkGreen.withOpacity(0.75),
-                              fontSize: 20,
-                            ),
-                          ),
-                          Text(
-                            'Leonardo!',
-                            style: TextStyle(
-                              color: ColorPalette.darkGreen.withOpacity(0.75),
-                              fontSize: 36,
-                            ),
-                          ),
-                        ],
-                      ),
-                      InkWell(
-                        onTap: () async =>
-                            await Get.to(() => const ProfilePage()),
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: ColorPalette.darkGreen,
-                                width: 3,
-                              ),
-                            ),
-                            child: FlutterLogo(
-                              size: deviceSize.height * 0.05,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(flex: 1),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 25, bottom: 25),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
+              child: LayoutBuilder(
+                builder: (context, constraints) => Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: Container(
-                                alignment: Alignment.center,
-                                padding: const EdgeInsets.all(10),
-                                height: deviceSize.height * 0.25,
-                                width: deviceSize.height * 0.25,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: ColorPalette.green,
-                                    width: 3,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      greeting,
+                                      style: TextStyle(
+                                        color: ColorPalette.darkGreen
+                                            .withOpacity(0.75),
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Leonardo!',
+                                      style: TextStyle(
+                                        color: ColorPalette.darkGreen
+                                            .withOpacity(0.75),
+                                        fontSize: 36,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                InkWell(
+                                  onTap: () async =>
+                                      await Get.to(() => const ProfilePage()),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: ColorPalette.darkGreen,
+                                          width: 3,
+                                        ),
+                                      ),
+                                      child: FlutterLogo(
+                                        size: deviceSize.height * 0.05,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                child: const Text('Pie Chart'),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                  onPressed: () {},
+                                  child: Text(
+                                    '...',
+                                    style: TextStyle(
+                                      color: ColorPalette.darkGreen
+                                          .withOpacity(0.75),
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 25),
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                          top: 10, bottom: 10),
+                                      height: Get.width * 0.5,
+                                      width: Get.width * 0.5,
+                                      child: Stack(children: [
+                                        const NutrientPieChart(
+                                          carbs: 370,
+                                          proteins: 500,
+                                          fats: 135,
+                                        ),
+                                        Center(
+                                          child: Text(
+                                            '$gainedCalories / $dailyCalorieLimit\nkcal',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: ColorPalette.darkGreen
+                                                  .withOpacity(0.75),
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ]),
+                                    ),
+                                  ),
+                                ),
+                                const Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(bottom: 25),
+                                    child: Text(
+                                      'Bar Charts\nC | P | F',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Water Counter',
+                                      style: TextStyle(
+                                        color: ColorPalette.darkGreen
+                                            .withOpacity(0.75),
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${drankWaterBottle * waterBottleCapacity!} / $dailyWaterLimit L",
+                                      style: TextStyle(
+                                        color: ColorPalette.darkGreen
+                                            .withOpacity(0.75),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          _openWaterCounterSettings(
+                                        context: context,
+                                        onWaterLimitUpdate: (waterLimit) async {
+                                          setState(() {
+                                            drankWaterBottle = 0;
+                                            dailyWaterLimit = waterLimit;
+                                            waterBottleItemCount =
+                                                (dailyWaterLimit! /
+                                                        waterBottleCapacity!)
+                                                    .toInt();
+                                            waterBottleItemStates =
+                                                List.generate(
+                                              waterBottleItemCount,
+                                              (_) => false,
+                                            );
+                                          });
+
+                                          await _updateWaterLimitData();
+                                        },
+                                      ),
+                                      child: Text(
+                                        '...',
+                                        style: TextStyle(
+                                          color: ColorPalette.darkGreen
+                                              .withOpacity(0.75),
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20)
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: SizedBox(
+                                height: deviceSize.height * 0.15,
+                                child: GridView.builder(
+                                  padding: EdgeInsets.zero,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount:
+                                        6, // Number of items per row
+                                    crossAxisSpacing:
+                                        2, // Space between items horizontally
+                                    mainAxisSpacing: 5, // Space between rows
+                                  ),
+                                  itemCount: waterBottleItemCount,
+                                  itemBuilder: (context, index) => GridItem(
+                                    index: index,
+                                    isPressed: waterBottleItemStates[index],
+                                    onToggle: (isPressed) =>
+                                        _updateWaterBottleCount(
+                                            index, isPressed),
+                                  ),
+                                ),
                               ),
                             ),
-                            Text(
-                              '$gainedCalories / $dailyCalorieLimit\nkcal',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: ColorPalette.darkGreen.withOpacity(0.75),
-                                fontSize: 14,
-                              ),
-                            )
                           ],
                         ),
-                        TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            '...',
-                            style: TextStyle(
-                              color: ColorPalette.darkGreen.withOpacity(0.75),
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 25, bottom: 25),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text(
-                            'Water Counter',
-                            style: TextStyle(
-                              color: ColorPalette.darkGreen.withOpacity(0.75),
-                              fontSize: 20,
+                          const Spacer(flex: 1),
+                          InkWell(
+                            onTap: () {},
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(5),
+                              height: deviceSize.height * 0.075,
+                              width: deviceSize.height * 0.075,
+                              child: Image.asset(
+                                  'assets/illustrations/checklist.png'),
                             ),
                           ),
-                          Text(
-                            "${drankWaterBottle * waterBottleCapacity!} / $dailyWaterLimit L",
-                            style: TextStyle(
-                              color: ColorPalette.darkGreen.withOpacity(0.75),
-                              fontSize: 14,
+                          const Spacer(flex: 3),
+                          InkWell(
+                            onTap: () async =>
+                                await Get.to(() => const CameraScreen()),
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: deviceSize.height * 0.075,
+                              width: deviceSize.height * 0.075,
+                              child: Image.asset(
+                                  'assets/illustrations/camera.png'),
                             ),
                           ),
+                          const Spacer(flex: 3),
+                          InkWell(
+                            onTap: () async =>
+                                Get.to(() => const AnalysisPage()),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(5),
+                              height: deviceSize.height * 0.075,
+                              width: deviceSize.height * 0.075,
+                              child: Image.asset(
+                                  'assets/illustrations/analytics.png'),
+                            ),
+                          ),
+                          const Spacer(flex: 1),
                         ],
                       ),
-                      Column(
-                        children: [
-                          TextButton(
-                            onPressed: () => _openWaterCounterSettings(
-                              context: context,
-                              onWaterLimitUpdate: (waterLimit) async {
-                                setState(() {
-                                  drankWaterBottle = 0;
-                                  dailyWaterLimit = waterLimit;
-                                  waterBottleItemCount =
-                                      (dailyWaterLimit! / waterBottleCapacity!)
-                                          .toInt();
-                                  waterBottleItemStates = List.generate(
-                                    waterBottleItemCount,
-                                    (_) => false,
-                                  );
-                                });
-
-                                await _updateWaterLimitData();
-                              },
-                            ),
-                            child: Text(
-                              '...',
-                              style: TextStyle(
-                                color: ColorPalette.darkGreen.withOpacity(0.75),
-                                fontSize: 20,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20)
-                        ],
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: SizedBox(
-                      height: deviceSize.height * 0.15,
-                      child: GridView.builder(
-                        padding: EdgeInsets.zero,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 6, // Number of items per row
-                          crossAxisSpacing:
-                              2, // Space between items horizontally
-                          mainAxisSpacing: 5, // Space between rows
-                        ),
-                        itemCount: waterBottleItemCount,
-                        itemBuilder: (context, index) => GridItem(
-                          index: index,
-                          isPressed: waterBottleItemStates[index],
-                          onToggle: (isPressed) =>
-                              _updateWaterBottleCount(index, isPressed),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Spacer(flex: 1),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 25, bottom: 25),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const Spacer(flex: 1),
-                        InkWell(
-                          onTap: () {},
-                          child: Container(
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.all(5),
-                            height: deviceSize.height * 0.075,
-                            width: deviceSize.height * 0.075,
-                            child: Image.asset(
-                                'assets/illustrations/checklist.png'),
-                          ),
-                        ),
-                        const Spacer(flex: 3),
-                        InkWell(
-                          onTap: () async =>
-                              await Get.to(() => const CameraScreen()),
-                          child: Container(
-                            alignment: Alignment.center,
-                            height: deviceSize.height * 0.075,
-                            width: deviceSize.height * 0.075,
-                            child:
-                                Image.asset('assets/illustrations/camera.png'),
-                          ),
-                        ),
-                        const Spacer(flex: 3),
-                        InkWell(
-                          onTap: () async => Get.to(() => const AnalysisPage()),
-                          child: Container(
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.all(5),
-                            height: deviceSize.height * 0.075,
-                            width: deviceSize.height * 0.075,
-                            child: Image.asset(
-                                'assets/illustrations/analytics.png'),
-                          ),
-                        ),
-                        const Spacer(flex: 1),
-                      ],
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
     );

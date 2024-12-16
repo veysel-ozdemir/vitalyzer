@@ -23,6 +23,8 @@ dependencies:
   permission_handler: ^11.3.1
   image_picker: ^1.1.2
   syncfusion_flutter_gauges: ^28.1.33
+  fl_chart: ^0.69.2
+  flutter_svg: ^2.0.16
 
 dev_dependencies:
   flutter_test:
@@ -37,3 +39,6 @@ flutter:
     - "assets/illustrations/camera.png"
     - "assets/illustrations/checklist.png"
     - "assets/illustrations/water-bottle.png"
+    - "assets/icons/cooking-oil.svg"
+    - "assets/icons/steak.svg"
+    - "assets/icons/wheat.svg"

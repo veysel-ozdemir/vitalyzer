@@ -137,20 +137,22 @@ class _AnalysisPageState extends State<AnalysisPage> {
               padding: const EdgeInsets.all(25),
               width: Get.width,
               child: showResult
-                  ? Column(
-                      children: [
-                        const Text(
-                          "Result",
-                          style: TextStyle(
-                            color: ColorPalette.darkGreen,
-                            fontSize: 20,
+                  ? SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          const Text(
+                            "Result",
+                            style: TextStyle(
+                              color: ColorPalette.darkGreen,
+                              fontSize: 20,
+                            ),
                           ),
-                        ),
-                        const Divider(
-                            color: ColorPalette.lightGreen, thickness: 2),
-                        const SizedBox(height: 15),
-                        BMIGauge(bmiValue: bmiValue!),
-                      ],
+                          const Divider(
+                              color: ColorPalette.lightGreen, thickness: 2),
+                          const SizedBox(height: 15),
+                          BMIGauge(bmiValue: bmiValue!),
+                        ],
+                      ),
                     )
                   : Column(
                       children: [
