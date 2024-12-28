@@ -9,6 +9,7 @@ import 'package:vitalyzer/presentation/camera/camera_screen.dart';
 import 'package:vitalyzer/presentation/page/analysis_page.dart';
 import 'package:vitalyzer/presentation/page/profile_page.dart';
 import 'package:vitalyzer/presentation/widget/grid_item.dart';
+import 'package:vitalyzer/presentation/widget/nutrient_bar_chart.dart';
 import 'package:vitalyzer/presentation/widget/nutrient_pie_chart.dart';
 import 'package:vitalyzer/util/extension.dart';
 
@@ -205,40 +206,50 @@ class _HomePageState extends State<HomePage> {
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 25),
+                                    padding: const EdgeInsets.only(
+                                        bottom: 25, left: 10),
                                     child: Container(
                                       padding: const EdgeInsets.only(
                                           top: 10, bottom: 10),
-                                      height: Get.width * 0.5,
-                                      width: Get.width * 0.5,
-                                      child: Stack(children: [
-                                        const NutrientPieChart(
-                                          carbs: 370,
-                                          proteins: 500,
-                                          fats: 135,
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            '$gainedCalories / $dailyCalorieLimit\nkcal',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: ColorPalette.darkGreen
-                                                  .withOpacity(0.75),
-                                              fontSize: 14,
+                                      height: Get.width * 0.4,
+                                      width: Get.width * 0.4,
+                                      child: Stack(
+                                        children: [
+                                          const NutrientPieChart(
+                                            carbs: 370,
+                                            proteins: 500,
+                                            fats: 135,
+                                          ),
+                                          Center(
+                                            child: Text(
+                                              '$gainedCalories / $dailyCalorieLimit\nkcal',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: ColorPalette.darkGreen
+                                                    .withOpacity(0.75),
+                                                fontSize: 14,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ]),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                                const Align(
+                                Align(
                                   alignment: Alignment.centerRight,
                                   child: Padding(
-                                    padding: EdgeInsets.only(bottom: 25),
-                                    child: Text(
-                                      'Bar Charts\nC | P | F',
-                                      textAlign: TextAlign.center,
+                                    padding: const EdgeInsets.only(bottom: 25),
+                                    child: SizedBox(
+                                      width: Get.width * 0.35,
+                                      child: const NutrientBarChart(
+                                        carbs: 370,
+                                        proteins: 500,
+                                        fats: 135,
+                                        carbsMaxGram: 600,
+                                        proteinsMaxGram: 1200,
+                                        fatsMaxGram: 200,
+                                      ),
                                     ),
                                   ),
                                 )
