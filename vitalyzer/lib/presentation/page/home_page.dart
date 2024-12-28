@@ -25,9 +25,21 @@ class _HomePageState extends State<HomePage> {
 
   double? waterBottleCapacity;
   double? dailyWaterLimit;
-  int? gainedCalories;
-  int? dailyCalorieLimit;
   int drankWaterBottle = 0;
+  double dailyCalorieLimit = 0;
+  double gainedCalories = 0;
+  double? carbsCalorieLimit;
+  double? proteinCalorieLimit;
+  double? fatCalorieLimit;
+  double? gainedCarbsCalorie;
+  double? gainedProteinCalorie;
+  double? gainedFatCalorie;
+  double? carbsGramLimit;
+  double? proteinGramLimit;
+  double? fatGramLimit;
+  double? gainedCarbsGram;
+  double? gainedProteinGram;
+  double? gainedFatGram;
   List<bool> waterBottleItemStates = []; // Pressed states of items
   late SharedPreferences prefs;
 
@@ -49,9 +61,31 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       dailyWaterLimit = prefs.getDouble('dailyWaterLimit');
       waterBottleCapacity = prefs.getDouble('waterBottleCapacity');
+
       waterBottleItemCount = (dailyWaterLimit! / waterBottleCapacity!).toInt();
-      gainedCalories = prefs.getInt('gainedCalories');
-      dailyCalorieLimit = prefs.getInt('dailyCalorieLimit');
+
+      carbsCalorieLimit = prefs.getDouble('carbsCalorieLimit');
+      proteinCalorieLimit = prefs.getDouble('proteinCalorieLimit');
+      fatCalorieLimit = prefs.getDouble('fatCalorieLimit');
+
+      dailyCalorieLimit =
+          carbsCalorieLimit! + proteinCalorieLimit! + fatCalorieLimit!;
+
+      carbsGramLimit = prefs.getDouble('carbsGramLimit');
+      proteinGramLimit = prefs.getDouble('proteinGramLimit');
+      fatGramLimit = prefs.getDouble('fatGramLimit');
+
+      gainedCarbsCalorie = prefs.getDouble('gainedCarbsCalorie');
+      gainedProteinCalorie = prefs.getDouble('gainedProteinCalorie');
+      gainedFatCalorie = prefs.getDouble('gainedFatCalorie');
+
+      gainedCalories =
+          gainedCarbsCalorie! + gainedProteinCalorie! + gainedFatCalorie!;
+
+      gainedCarbsGram = prefs.getDouble('gainedCarbsGram');
+      gainedProteinGram = prefs.getDouble('gainedProteinGram');
+      gainedFatGram = prefs.getDouble('gainedFatGram');
+
       drankWaterBottle = prefs.getInt('drankWaterBottle')!;
 
       final savedStates = prefs.getStringList('waterBottleItemStates');
@@ -77,6 +111,23 @@ class _HomePageState extends State<HomePage> {
       waterBottleItemStates[index] = isPressed; // Update state for this item
       _saveWaterData(); // Save updated value
     });
+  }
+
+  Future<void> _updateCalorieLimitData() async {
+    await prefs.setDouble('gainedCarbsCalorie', gainedCarbsCalorie!);
+    await prefs.setDouble('gainedProteinCalorie', gainedProteinCalorie!);
+    await prefs.setDouble('gainedFatCalorie', gainedFatCalorie!);
+    await prefs.setDouble('gainedCarbsGram', gainedCarbsGram!);
+    await prefs.setDouble('gainedProteinGram', gainedProteinGram!);
+    await prefs.setDouble('gainedFatGram', gainedFatGram!);
+
+    await prefs.setDouble('carbsCalorieLimit', carbsCalorieLimit!);
+    await prefs.setDouble('proteinCalorieLimit', proteinCalorieLimit!);
+    await prefs.setDouble('fatCalorieLimit', fatCalorieLimit!);
+
+    await prefs.setDouble('carbsGramLimit', carbsGramLimit!);
+    await prefs.setDouble('proteinGramLimit', proteinGramLimit!);
+    await prefs.setDouble('fatGramLimit', fatGramLimit!);
   }
 
   Future<void> _updateWaterLimitData() async {
@@ -188,7 +239,24 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: () => _openNutritionSettings(
+                                    context: context,
+                                    onNutritionLimitUpdate:
+                                        (calorieLimit) async {
+                                      setState(() {
+                                        dailyCalorieLimit = calorieLimit;
+                                        gainedCalories = 0.0;
+                                        gainedCarbsCalorie = 0.0;
+                                        gainedProteinCalorie = 0.0;
+                                        gainedFatCalorie = 0.0;
+                                        gainedCarbsGram = 0.0;
+                                        gainedProteinGram = 0.0;
+                                        gainedFatGram = 0.0;
+                                      });
+                                      // todo: get the new gram and calorie limit values of each macronutrients according to the customized calorie limit from the AI tool
+                                      await _updateCalorieLimitData();
+                                    },
+                                  ),
                                   child: Text(
                                     '...',
                                     style: TextStyle(
@@ -215,14 +283,23 @@ class _HomePageState extends State<HomePage> {
                                       width: Get.width * 0.4,
                                       child: Stack(
                                         children: [
-                                          const NutrientPieChart(
-                                            carbs: 370,
-                                            proteins: 500,
-                                            fats: 135,
-                                          ),
+                                          (gainedCalories > 0.0)
+                                              ? NutrientPieChart(
+                                                  carbs: gainedCarbsCalorie!,
+                                                  proteins:
+                                                      gainedProteinCalorie!,
+                                                  fats: gainedFatCalorie!,
+                                                )
+                                              : NutrientPieChart(
+                                                  carbs: carbsCalorieLimit!,
+                                                  proteins:
+                                                      proteinCalorieLimit!,
+                                                  fats: fatCalorieLimit!,
+                                                  opacity: 0.3,
+                                                ),
                                           Center(
                                             child: Text(
-                                              '$gainedCalories / $dailyCalorieLimit\nkcal',
+                                              '${gainedCalories.floor()} / ${dailyCalorieLimit.floor()}\nkcal',
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: ColorPalette.darkGreen
@@ -242,13 +319,13 @@ class _HomePageState extends State<HomePage> {
                                     padding: const EdgeInsets.only(bottom: 25),
                                     child: SizedBox(
                                       width: Get.width * 0.35,
-                                      child: const NutrientBarChart(
-                                        carbs: 370,
-                                        proteins: 500,
-                                        fats: 135,
-                                        carbsMaxGram: 600,
-                                        proteinsMaxGram: 1200,
-                                        fatsMaxGram: 200,
+                                      child: NutrientBarChart(
+                                        carbs: gainedCarbsGram!,
+                                        proteins: gainedProteinGram!,
+                                        fats: gainedFatGram!,
+                                        carbsMaxGram: carbsGramLimit!,
+                                        proteinsMaxGram: proteinGramLimit!,
+                                        fatsMaxGram: fatGramLimit!,
                                       ),
                                     ),
                                   ),
@@ -399,6 +476,220 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _openNutritionSettings({
+    required BuildContext context,
+    required void Function(double) onNutritionLimitUpdate,
+  }) {
+    const int minIntegerPart = 1200;
+    const int maxIntegerPart = 3500;
+    const int minFractionPart = 0;
+    const int maxFractionPart = 9;
+
+    int initialIntegerPart = dailyCalorieLimit.floor();
+    int initialFractionPart = (dailyCalorieLimit * 10 % 10).toInt();
+
+    // Scroll controllers for the two pickers
+    FixedExtentScrollController integerPartController =
+        FixedExtentScrollController(
+      initialItem: initialIntegerPart - minIntegerPart,
+    );
+    FixedExtentScrollController fractionPartController =
+        FixedExtentScrollController(
+      initialItem: initialFractionPart,
+    );
+
+    final deviceSize = context.deviceSize;
+
+    double calorieLimit = dailyCalorieLimit;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ColorPalette.beige,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        side: BorderSide(
+          color: ColorPalette.lightGreen,
+          width: 3,
+        ),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              padding: const EdgeInsets.all(25),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Customize Calorie Limit",
+                    style: TextStyle(
+                      color: ColorPalette.darkGreen,
+                      fontSize: 20,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 200,
+                    child: CupertinoTheme(
+                      data: CupertinoThemeData(
+                        textTheme: CupertinoTextThemeData(
+                          pickerTextStyle:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: ColorPalette.darkGreen,
+                                  ),
+                        ),
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Spacer(flex: 1),
+                              Expanded(
+                                child: CupertinoPicker(
+                                  scrollController: integerPartController,
+                                  itemExtent: 40,
+                                  selectionOverlay: Container(
+                                    decoration: BoxDecoration(
+                                      color: ColorPalette.lightGreen
+                                          .withOpacity(0.5),
+                                      border: const Border(
+                                        left: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                        top: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                        bottom: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                      ),
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(8),
+                                        bottomLeft: Radius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                  onSelectedItemChanged: (int index) {
+                                    setState(() {
+                                      initialIntegerPart =
+                                          index + minIntegerPart;
+                                      calorieLimit = initialIntegerPart +
+                                          initialFractionPart / 10.0;
+                                    });
+                                  },
+                                  children: List.generate(
+                                    maxIntegerPart - minIntegerPart + 1,
+                                    (index) => Center(
+                                      child: Text(
+                                        "${index + minIntegerPart}",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: CupertinoPicker(
+                                  scrollController: fractionPartController,
+                                  itemExtent: 40,
+                                  selectionOverlay: Container(
+                                    decoration: BoxDecoration(
+                                      color: ColorPalette.lightGreen
+                                          .withOpacity(0.5),
+                                      border: const Border(
+                                        right: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                        top: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                        bottom: BorderSide(
+                                          color: ColorPalette.lightGreen,
+                                          width: 3,
+                                        ),
+                                      ),
+                                      borderRadius: const BorderRadius.only(
+                                        topRight: Radius.circular(8),
+                                        bottomRight: Radius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                  onSelectedItemChanged: (int index) {
+                                    setState(() {
+                                      initialFractionPart = index;
+                                      calorieLimit = initialIntegerPart +
+                                          initialFractionPart / 10.0;
+                                    });
+                                  },
+                                  children: List.generate(
+                                    maxFractionPart - minFractionPart + 1,
+                                    (index) => Center(
+                                      child: Text(
+                                        "$index",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Spacer(flex: 1),
+                            ],
+                          ),
+                          const Center(
+                            child: Text(
+                              '.',
+                              style: TextStyle(
+                                color: ColorPalette.darkGreen,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            right: deviceSize.width * 0.1,
+                            child: const Text(
+                              'kcal',
+                              style: TextStyle(
+                                color: ColorPalette.darkGreen,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      fixedSize: WidgetStatePropertyAll(
+                        Size.fromWidth(deviceSize.width * 0.5),
+                      ),
+                      backgroundColor:
+                          const WidgetStatePropertyAll(ColorPalette.green),
+                    ),
+                    onPressed: () {
+                      onNutritionLimitUpdate(calorieLimit); // Call the callback
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      'Select',
+                      style: TextStyle(color: ColorPalette.beige),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _openWaterCounterSettings({
     required BuildContext context,
     required void Function(double) onWaterLimitUpdate,
@@ -443,7 +734,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    "Daily Water Limit",
+                    "Customize Water Limit",
                     style: TextStyle(
                       color: ColorPalette.darkGreen,
                       fontSize: 20,

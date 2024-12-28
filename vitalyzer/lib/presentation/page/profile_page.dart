@@ -37,7 +37,12 @@ class _ProfilePageState extends State<ProfilePage> {
   int? selectedHeight;
   double? selectedWeight;
   double? bodyMassIndexLevel;
-  int? dailyCalorieLimit;
+  double? carbsCalorieLimit;
+  double? proteinCalorieLimit;
+  double? fatCalorieLimit;
+  double? carbsGramLimit;
+  double? proteinGramLimit;
+  double? fatGramLimit;
   double? dailyWaterLimit;
   double? waterBottleCapacity;
 
@@ -60,7 +65,12 @@ class _ProfilePageState extends State<ProfilePage> {
       selectedHeight = prefs.getInt('userHeight');
       selectedWeight = prefs.getDouble('userWeight');
       bodyMassIndexLevel = prefs.getDouble('bodyMassIndexLevel');
-      dailyCalorieLimit = prefs.getInt('dailyCalorieLimit');
+      carbsCalorieLimit = prefs.getDouble('carbsCalorieLimit');
+      proteinCalorieLimit = prefs.getDouble('proteinCalorieLimit');
+      fatCalorieLimit = prefs.getDouble('fatCalorieLimit');
+      carbsGramLimit = prefs.getDouble('carbsGramLimit');
+      proteinGramLimit = prefs.getDouble('proteinGramLimit');
+      fatGramLimit = prefs.getDouble('fatGramLimit');
       dailyWaterLimit = prefs.getDouble('dailyWaterLimit');
       waterBottleCapacity = prefs.getDouble('waterBottleCapacity');
     });
@@ -106,13 +116,34 @@ class _ProfilePageState extends State<ProfilePage> {
 
     await prefs.setDouble('dailyWaterLimit',
         dailyWaterLimit!); // todo: get the new calculated value from AI tool
-    await prefs.setInt('dailyCalorieLimit',
-        dailyCalorieLimit!); // todo: get the new calculated value from AI tool
+    await prefs.setDouble('carbsCalorieLimit',
+        carbsCalorieLimit!); // todo: get the new calculated value from AI tool
+    await prefs.setDouble('proteinCalorieLimit',
+        proteinCalorieLimit!); // todo: get the new calculated value from AI tool
+    await prefs.setDouble('fatCalorieLimit',
+        fatCalorieLimit!); // todo: get the new calculated value from AI tool
+    await prefs.setDouble('carbsGramLimit',
+        carbsGramLimit!); // todo: get the new calculated value from AI tool
+    await prefs.setDouble('proteinGramLimit',
+        proteinGramLimit!); // todo: get the new calculated value from AI tool
+    await prefs.setDouble('fatGramLimit',
+        fatGramLimit!); // todo: get the new calculated value from AI tool
 
     await prefs.setInt(
-        'gainedCalories', 0); // todo: save current calories instead
-    await prefs.setInt(
         'drankWaterBottle', 0); // todo: save current drank water bottle instead
+
+    await prefs.setDouble(
+        'gainedCarbsCalorie', 355.0); // todo: save the current gains instead
+    await prefs.setDouble(
+        'gainedProteinCalorie', 665.0); // todo: save the current gains instead
+    await prefs.setDouble(
+        'gainedFatCalorie', 105.0); // todo: save the current gains instead
+    await prefs.setDouble(
+        'gainedCarbsGram', 205.0); // todo: save the current gains instead
+    await prefs.setDouble(
+        'gainedProteinGram', 875.0); // todo: save the current gains instead
+    await prefs.setDouble(
+        'gainedFatGram', 65.0); // todo: save the current gains instead
 
     int waterBottleItemCount =
         (dailyWaterLimit! / waterBottleCapacity!).toInt();

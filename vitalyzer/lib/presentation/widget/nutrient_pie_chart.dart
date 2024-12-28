@@ -7,12 +7,14 @@ class NutrientPieChart extends StatelessWidget {
   final double carbs;
   final double proteins;
   final double fats;
+  final double? opacity;
 
   const NutrientPieChart({
     super.key,
     required this.carbs,
     required this.proteins,
     required this.fats,
+    this.opacity,
   });
 
   @override
@@ -22,7 +24,7 @@ class NutrientPieChart extends StatelessWidget {
         sections: [
           PieChartSectionData(
             value: carbs,
-            color: ColorPalette.darkGreen.withOpacity(0.75),
+            color: ColorPalette.darkGreen.withOpacity(opacity ?? 0.75),
             radius: 40,
             title: '',
             badgeWidget: SvgBadge(
@@ -34,7 +36,7 @@ class NutrientPieChart extends StatelessWidget {
           ),
           PieChartSectionData(
             value: proteins,
-            color: ColorPalette.green.withOpacity(0.75),
+            color: ColorPalette.green.withOpacity(opacity ?? 0.75),
             radius: 40,
             title: '',
             badgeWidget: SvgBadge(
@@ -46,7 +48,7 @@ class NutrientPieChart extends StatelessWidget {
           ),
           PieChartSectionData(
             value: fats,
-            color: ColorPalette.lightGreen.withOpacity(0.75),
+            color: ColorPalette.lightGreen.withOpacity(opacity ?? 0.75),
             radius: 40,
             title: '',
             badgeWidget: SvgBadge(

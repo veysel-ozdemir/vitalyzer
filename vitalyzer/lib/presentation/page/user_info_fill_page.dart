@@ -20,8 +20,13 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
   int? selectedAge;
   int? selectedHeight;
   double? selectedWeight;
-  int? dailyCalorieLimit;
+  double? carbsCalorieLimit;
+  double? proteinCalorieLimit;
+  double? fatCalorieLimit;
   double? dailyWaterLimit;
+  double? carbsGramLimit;
+  double? proteinGramLimit;
+  double? fatGramLimit;
   double? bodyMassIndexLevel;
   bool isSelectionComplete = false;
   late SharedPreferences prefs;
@@ -45,10 +50,19 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
         'dailyWaterLimit',
         dailyWaterLimit ??
             4.0); // todo: get the value from AI tool and remove the conditional statement afterwards
-    await prefs.setInt(
-        'dailyCalorieLimit',
-        dailyCalorieLimit ??
-            2020); // todo: get the value from AI tool and remove the conditional statement afterwards
+
+    await prefs.setDouble(
+        'carbsCalorieLimit',
+        carbsCalorieLimit ??
+            550.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+    await prefs.setDouble(
+        'proteinCalorieLimit',
+        proteinCalorieLimit ??
+            1230.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+    await prefs.setDouble(
+        'fatCalorieLimit',
+        fatCalorieLimit ??
+            148.0); // todo: get the value from AI tool and remove the conditional statement afterwards
 
     bodyMassIndexLevel = calculateBodyMassIndex(
       kgWeight: selectedWeight!,
@@ -56,8 +70,26 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     );
     await prefs.setDouble('bodyMassIndexLevel', bodyMassIndexLevel!);
     await prefs.setDouble('waterBottleCapacity', 0.5);
-    await prefs.setInt('gainedCalories', 0);
     await prefs.setInt('drankWaterBottle', 0);
+    await prefs.setDouble('gainedCarbsCalorie', 0.0);
+    await prefs.setDouble('gainedProteinCalorie', 0.0);
+    await prefs.setDouble('gainedFatCalorie', 0.0);
+    await prefs.setDouble('gainedCarbsGram', 0.0);
+    await prefs.setDouble('gainedProteinGram', 0.0);
+    await prefs.setDouble('gainedFatGram', 0.0);
+    await prefs.setDouble(
+        'carbsGramLimit',
+        carbsGramLimit ??
+            550.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+    await prefs.setDouble(
+        'proteinGramLimit',
+        proteinGramLimit ??
+            1200.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+    await prefs.setDouble(
+        'fatGramLimit',
+        fatGramLimit ??
+            150.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+
     await prefs.setBool('userHasFilledInfoForm', true);
   }
 
