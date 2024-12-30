@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/presentation/camera/camera_screen.dart';
 import 'package:vitalyzer/presentation/page/analysis_page.dart';
+import 'package:vitalyzer/presentation/page/food_drink_search_page.dart';
 import 'package:vitalyzer/presentation/page/profile_page.dart';
 import 'package:vitalyzer/presentation/widget/grid_item.dart';
 import 'package:vitalyzer/presentation/widget/nutrient_bar_chart.dart';
@@ -430,7 +431,8 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           const Spacer(flex: 1),
                           InkWell(
-                            onTap: () {},
+                            onTap: () async =>
+                                await Get.to(() => const FoodDrinkSearchPage()),
                             child: Container(
                               alignment: Alignment.center,
                               padding: const EdgeInsets.all(5),

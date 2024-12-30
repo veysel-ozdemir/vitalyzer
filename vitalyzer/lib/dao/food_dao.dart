@@ -23,4 +23,8 @@ class FoodDao {
     final db = await _dbHelper.database;
     return await db.delete('Food', where: 'Id = ?', whereArgs: [id]);
   }
+
+  Future<Map<String, dynamic>?> getFoodByName(String name) async {
+    return await _dbHelper.getFoodByName(name);
+  }
 }

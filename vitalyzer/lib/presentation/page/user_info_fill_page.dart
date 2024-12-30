@@ -71,6 +71,12 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     await prefs.setDouble('bodyMassIndexLevel', bodyMassIndexLevel!);
     await prefs.setDouble('waterBottleCapacity', 0.5);
     await prefs.setInt('drankWaterBottle', 0);
+
+    // Set the standard kcal/g of macronutrients (4-4-9)
+    await prefs.setInt('carbsCaloriePerGram', 4);
+    await prefs.setInt('proteinCaloriePerGram', 4);
+    await prefs.setInt('fatCaloriePerGram', 9);
+
     await prefs.setDouble('gainedCarbsCalorie', 0.0);
     await prefs.setDouble('gainedProteinCalorie', 0.0);
     await prefs.setDouble('gainedFatCalorie', 0.0);

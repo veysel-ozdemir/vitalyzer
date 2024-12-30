@@ -32,6 +32,7 @@ Future<void> _initDB() async {
   // Initialize the database helper
   final dbHelper = DatabaseHelper();
   // Initialize database
+  // ignore: unused_local_variable
   final db = await dbHelper.database;
 
   // Parse CSV

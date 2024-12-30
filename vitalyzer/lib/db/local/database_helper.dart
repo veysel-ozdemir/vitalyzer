@@ -95,4 +95,19 @@ class DatabaseHelper {
       }
     }
   }
+
+  Future<Map<String, dynamic>?> getFoodByName(String name) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      'Food',
+      where: 'LOWER(Name) = ?',
+      whereArgs: [name.toLowerCase()],
+      limit: 1,
+    );
+
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null;
+  }
 }
