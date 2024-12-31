@@ -5,7 +5,6 @@ import 'package:vitalyzer/controller/permission_controller.dart';
 import 'package:vitalyzer/controller/scan_controller.dart';
 import 'package:vitalyzer/presentation/camera/camera_viewer.dart';
 import 'package:vitalyzer/presentation/camera/capture_button.dart';
-import 'package:vitalyzer/presentation/camera/top_image_viewer.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -48,15 +47,12 @@ class _CameraScreenState extends State<CameraScreen> {
           );
         }
         return (scanController.isInitialized == true)
-            ? PopScope(
-                onPopInvokedWithResult: (didPop, result) =>
-                    scanController.clearImageList(),
-                child: const Stack(
+            ? const PopScope(
+                child: Stack(
                   alignment: Alignment.center,
                   children: [
                     CameraViewer(),
                     CaptureButton(),
-                    TopImageViewer(),
                   ],
                 ),
               )

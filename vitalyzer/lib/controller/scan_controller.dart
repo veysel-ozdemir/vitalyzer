@@ -1,31 +1,29 @@
-import 'dart:typed_data';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image/image.dart' as img;
 import 'package:vitalyzer/controller/permission_controller.dart';
+import 'package:vitalyzer/service/gemini_service.dart';
 
 class ScanController extends GetxController {
   late List<CameraDescription> _cameras;
   late CameraController _cameraController;
   final RxBool _isInitialized = RxBool(false);
-  CameraImage? _cameraImage;
-  final RxList<Uint8List> _imageList = RxList([]);
 
   CameraController get cameraController => _cameraController;
   bool get isInitialized => _isInitialized.value;
-  List<Uint8List> get imageList => _imageList;
 
   final PermissionController permissionController = Get.find();
   RxBool isLoading = true.obs;
+
+  final _geminiService = GeminiService();
+  var isAnalyzing = false.obs;
+  var analysisResult = ''.obs;
 
   @override
   void dispose() {
     // called when the controller is removed from the memory
     _cameraController.dispose();
     _isInitialized.value = false;
-    _imageList.clear(); // Clear the image list to reset state
     super.dispose();
   }
 
@@ -34,7 +32,6 @@ class ScanController extends GetxController {
     // called when the controller is being deleted
     _cameraController.dispose();
     _isInitialized.value = false;
-    _imageList.clear(); // Clear the image list to reset state
     super.onClose();
   }
 
@@ -65,7 +62,6 @@ class ScanController extends GetxController {
 
         await _cameraController.initialize();
         _isInitialized.value = true;
-        _cameraController.startImageStream((image) => _cameraImage = image);
         _isInitialized.refresh();
 
         debugPrint('-- Camera Initialized Successfully --');
@@ -84,23 +80,37 @@ class ScanController extends GetxController {
     }
   }
 
-  void capture() {
-    if (_cameraImage != null) {
-      img.Image image = img.Image.fromBytes(
-        width: _cameraImage!.width,
-        height: _cameraImage!.height,
-        bytes: _cameraImage!.planes[0].bytes.buffer,
-        format: img.Format.uint8,
-        order: img.ChannelOrder.bgra,
+  Future<void> analyzeImage(XFile image) async {
+    try {
+      isAnalyzing.value = true;
+
+      // Read image bytes
+      final imageBytes = await image.readAsBytes();
+
+      // Analyze with Gemini
+      final result = await _geminiService.analyzeImageAndText(
+        imageBytes,
+        'Analyze this food image and provide nutritional information and ingredients if visible.',
       );
-      Uint8List list = Uint8List.fromList(img.encodeJpg(image));
-      _imageList.add(list);
-      _imageList.refresh();
+
+      analysisResult.value = result;
+    } catch (e) {
+      analysisResult.value = 'Error analyzing image: $e';
+    } finally {
+      isAnalyzing.value = false;
     }
   }
 
-  void clearImageList() {
-    _imageList.clear();
-    _imageList.refresh();
+  Future<XFile?> takePicture() async {
+    if (!_cameraController.value.isInitialized) {
+      return null;
+    }
+    try {
+      final XFile image = await _cameraController.takePicture();
+      return image;
+    } catch (e) {
+      debugPrint('Error taking picture: $e');
+      return null;
+    }
   }
 }

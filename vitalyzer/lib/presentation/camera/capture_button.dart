@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vitalyzer/controller/scan_controller.dart';
+import 'package:vitalyzer/presentation/camera/confirm_image_page.dart';
 
 class CaptureButton extends GetView<ScanController> {
   const CaptureButton({super.key});
@@ -10,7 +11,12 @@ class CaptureButton extends GetView<ScanController> {
     return Positioned(
       bottom: 30,
       child: GestureDetector(
-        onTap: () => controller.capture(),
+        onTap: () async {
+          final image = await controller.takePicture();
+          if (image != null) {
+            Get.to(() => ConfirmImagePage(image: image));
+          }
+        },
         child: Container(
           height: Get.height * 0.2,
           width: Get.width * 0.2,

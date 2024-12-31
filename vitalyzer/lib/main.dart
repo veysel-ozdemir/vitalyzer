@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/app/app.dart';
 import 'package:vitalyzer/db/local/database_helper.dart';
@@ -7,6 +8,9 @@ import 'package:vitalyzer/util/funtions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load the .env file
+  await dotenv.load(fileName: ".env");
 
   // Load shared preferences data
   final prefs = await SharedPreferences.getInstance();

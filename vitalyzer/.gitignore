@@ -44,3 +44,4 @@ app.*.map.json
 
 # Custom files
 *.DS_Store
+*.env
