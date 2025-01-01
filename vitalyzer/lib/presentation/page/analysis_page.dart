@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
-import 'package:vitalyzer/controller/nutrition_controller.dart';
 import 'package:vitalyzer/presentation/widget/bmi_gauge.dart';
 import 'package:vitalyzer/presentation/widget/user_info_container.dart';
 import 'package:vitalyzer/util/funtions.dart';
@@ -19,7 +18,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
   bool _isLoading = true;
   late SharedPreferences prefs;
   double? bodyMassIndexLevel;
-  final NutritionController _nutritionController = Get.find();
+  String? bmiAdvice;
   final _scrollController = ScrollController();
 
   @override
@@ -32,6 +31,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       bodyMassIndexLevel = prefs.getDouble('bodyMassIndexLevel');
+      bmiAdvice = prefs.getString('bmiAdvice');
       _isLoading = false;
     });
   }
@@ -81,7 +81,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                _nutritionController.bmiAdvice.value,
+                                bmiAdvice!,
                                 style: const TextStyle(
                                   color: ColorPalette.darkGreen,
                                   fontSize: 14,
