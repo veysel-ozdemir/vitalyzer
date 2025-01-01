@@ -61,7 +61,7 @@ class ConfirmImagePage extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     await controller.analyzeImage(image);
-                    Get.to(() => const ScanResultPage());
+                    Get.to(() => ScanResultPage());
                   },
                   style: ElevatedButton.styleFrom(
                     fixedSize: Size.fromWidth(Get.width * 0.3),

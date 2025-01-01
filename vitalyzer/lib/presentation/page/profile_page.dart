@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/controller/nutrition_controller.dart';
 import 'package:vitalyzer/controller/permission_controller.dart';
 import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/landing_page.dart';
@@ -30,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   final ImagePicker _imagePicker = ImagePicker();
   final PermissionController permissionController = Get.find();
+  final NutritionController nutritionController = Get.find();
 
   late SharedPreferences prefs;
   String? selectedSex;
@@ -43,8 +45,10 @@ class _ProfilePageState extends State<ProfilePage> {
   double? carbsGramLimit;
   double? proteinGramLimit;
   double? fatGramLimit;
-  double? dailyWaterLimit;
   double? waterBottleCapacity;
+  int? carbsCaloriePerGram;
+  int? proteinCaloriePerGram;
+  int? fatCaloriePerGram;
 
   // todo: get the current values of following variables and show in text form fields
   String? userName;
@@ -71,8 +75,10 @@ class _ProfilePageState extends State<ProfilePage> {
       carbsGramLimit = prefs.getDouble('carbsGramLimit');
       proteinGramLimit = prefs.getDouble('proteinGramLimit');
       fatGramLimit = prefs.getDouble('fatGramLimit');
-      dailyWaterLimit = prefs.getDouble('dailyWaterLimit');
       waterBottleCapacity = prefs.getDouble('waterBottleCapacity');
+      carbsCaloriePerGram = prefs.getInt('carbsCaloriePerGram');
+      proteinCaloriePerGram = prefs.getInt('proteinCaloriePerGram');
+      fatCaloriePerGram = prefs.getInt('fatCaloriePerGram');
     });
   }
 
@@ -108,45 +114,42 @@ class _ProfilePageState extends State<ProfilePage> {
     await prefs.setInt('userHeight', selectedHeight!);
     await prefs.setDouble('userWeight', selectedWeight!);
 
-    bodyMassIndexLevel = calculateBodyMassIndex(
-      kgWeight: selectedWeight!,
-      cmHeight: selectedHeight!,
-    );
     await prefs.setDouble('bodyMassIndexLevel', bodyMassIndexLevel!);
 
-    await prefs.setDouble('dailyWaterLimit',
-        dailyWaterLimit!); // todo: get the new calculated value from AI tool
+    await prefs.setString('bmiAdvice', nutritionController.bmiAdvice.value);
+
+    await prefs.setDouble(
+        'dailyWaterLimit', nutritionController.waterLimit.value);
     await prefs.setDouble('carbsCalorieLimit',
-        carbsCalorieLimit!); // todo: get the new calculated value from AI tool
+        nutritionController.carbsLimit.value * carbsCaloriePerGram!);
     await prefs.setDouble('proteinCalorieLimit',
-        proteinCalorieLimit!); // todo: get the new calculated value from AI tool
+        nutritionController.proteinLimit.value * proteinCaloriePerGram!);
     await prefs.setDouble('fatCalorieLimit',
-        fatCalorieLimit!); // todo: get the new calculated value from AI tool
-    await prefs.setDouble('carbsGramLimit',
-        carbsGramLimit!); // todo: get the new calculated value from AI tool
-    await prefs.setDouble('proteinGramLimit',
-        proteinGramLimit!); // todo: get the new calculated value from AI tool
-    await prefs.setDouble('fatGramLimit',
-        fatGramLimit!); // todo: get the new calculated value from AI tool
+        nutritionController.fatLimit.value * fatCaloriePerGram!);
+    await prefs.setDouble(
+        'carbsGramLimit', nutritionController.carbsLimit.value);
+    await prefs.setDouble(
+        'proteinGramLimit', nutritionController.proteinLimit.value);
+    await prefs.setDouble('fatGramLimit', nutritionController.fatLimit.value);
 
     await prefs.setInt(
         'drankWaterBottle', 0); // todo: save current drank water bottle instead
 
     await prefs.setDouble(
-        'gainedCarbsCalorie', 355.0); // todo: save the current gains instead
+        'gainedCarbsCalorie', 0.0); // todo: save the current gains instead
     await prefs.setDouble(
-        'gainedProteinCalorie', 665.0); // todo: save the current gains instead
+        'gainedProteinCalorie', 0.0); // todo: save the current gains instead
     await prefs.setDouble(
-        'gainedFatCalorie', 105.0); // todo: save the current gains instead
+        'gainedFatCalorie', 0.0); // todo: save the current gains instead
     await prefs.setDouble(
-        'gainedCarbsGram', 205.0); // todo: save the current gains instead
+        'gainedCarbsGram', 0.0); // todo: save the current gains instead
     await prefs.setDouble(
-        'gainedProteinGram', 875.0); // todo: save the current gains instead
+        'gainedProteinGram', 0.0); // todo: save the current gains instead
     await prefs.setDouble(
-        'gainedFatGram', 65.0); // todo: save the current gains instead
+        'gainedFatGram', 0.0); // todo: save the current gains instead
 
     int waterBottleItemCount =
-        (dailyWaterLimit! / waterBottleCapacity!).toInt();
+        (nutritionController.waterLimit.value / waterBottleCapacity!).toInt();
     await prefs.setStringList(
       'waterBottleItemStates',
       List.generate(waterBottleItemCount, (_) => false)
@@ -1230,6 +1233,24 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _saveChanges() async {
+    // calculate new bmi
+    bodyMassIndexLevel = calculateBodyMassIndex(
+      kgWeight: selectedWeight!,
+      cmHeight: selectedHeight!,
+    );
+    // get new bmi advice
+    await nutritionController.getBMIAdvice(
+      bmi: bodyMassIndexLevel!,
+      gender: selectedSex!,
+      age: selectedAge!,
+    );
+    // get new daily limits
+    await nutritionController.calculateNutritionLimits(
+      age: selectedAge!,
+      gender: selectedSex!,
+      height: selectedHeight!,
+      weight: selectedWeight!,
+    );
     // save physical information
     await _saveDataToSharedPrefs();
     // navigate to home page

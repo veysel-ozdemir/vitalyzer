@@ -88,10 +88,7 @@ class ScanController extends GetxController {
       final imageBytes = await image.readAsBytes();
 
       // Analyze with Gemini
-      final result = await _geminiService.analyzeImageAndText(
-        imageBytes,
-        'Analyze this food image and provide nutritional information and ingredients if visible.',
-      );
+      final result = await _geminiService.analyzeImageAndText(imageBytes);
 
       analysisResult.value = result;
     } catch (e) {

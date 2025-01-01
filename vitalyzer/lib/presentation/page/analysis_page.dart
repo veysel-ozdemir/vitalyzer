@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/controller/nutrition_controller.dart';
 import 'package:vitalyzer/presentation/widget/bmi_gauge.dart';
 import 'package:vitalyzer/presentation/widget/user_info_container.dart';
 import 'package:vitalyzer/util/funtions.dart';
@@ -18,6 +19,8 @@ class _AnalysisPageState extends State<AnalysisPage> {
   bool _isLoading = true;
   late SharedPreferences prefs;
   double? bodyMassIndexLevel;
+  final NutritionController _nutritionController = Get.find();
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -64,10 +67,28 @@ class _AnalysisPageState extends State<AnalysisPage> {
                       ),
                       height: Get.height * 0.25,
                       width: Get.width,
-                      child: const SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [],
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        scrollbarOrientation: ScrollbarOrientation.right,
+                        trackVisibility: true,
+                        interactive: true,
+                        thickness: 6,
+                        radius: const Radius.circular(30),
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(15),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _nutritionController.bmiAdvice.value,
+                                style: const TextStyle(
+                                  color: ColorPalette.darkGreen,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

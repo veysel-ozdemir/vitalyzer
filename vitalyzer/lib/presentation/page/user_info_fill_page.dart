@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/controller/nutrition_controller.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/presentation/widget/user_info_container.dart';
 import 'package:vitalyzer/util/extension.dart';
@@ -30,6 +31,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
   double? bodyMassIndexLevel;
   bool isSelectionComplete = false;
   late SharedPreferences prefs;
+  final NutritionController _nutritionController = Get.find();
 
   @override
   void initState() {
@@ -47,28 +49,20 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     await prefs.setInt('userHeight', selectedHeight!);
     await prefs.setDouble('userWeight', selectedWeight!);
     await prefs.setDouble(
-        'dailyWaterLimit',
-        dailyWaterLimit ??
-            4.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+        'dailyWaterLimit', _nutritionController.waterLimit.value);
 
+    // Set the calculated calorie limits according to the standartized kcal/g values
     await prefs.setDouble(
-        'carbsCalorieLimit',
-        carbsCalorieLimit ??
-            550.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+        'carbsCalorieLimit', _nutritionController.carbsLimit.value * 4);
     await prefs.setDouble(
-        'proteinCalorieLimit',
-        proteinCalorieLimit ??
-            1230.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+        'proteinCalorieLimit', _nutritionController.proteinLimit.value * 4);
     await prefs.setDouble(
-        'fatCalorieLimit',
-        fatCalorieLimit ??
-            148.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+        'fatCalorieLimit', _nutritionController.fatLimit.value * 9);
 
-    bodyMassIndexLevel = calculateBodyMassIndex(
-      kgWeight: selectedWeight!,
-      cmHeight: selectedHeight!,
-    );
     await prefs.setDouble('bodyMassIndexLevel', bodyMassIndexLevel!);
+
+    await prefs.setString('bmiAdvice', _nutritionController.bmiAdvice.value);
+
     await prefs.setDouble('waterBottleCapacity', 0.5);
     await prefs.setInt('drankWaterBottle', 0);
 
@@ -83,18 +77,13 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     await prefs.setDouble('gainedCarbsGram', 0.0);
     await prefs.setDouble('gainedProteinGram', 0.0);
     await prefs.setDouble('gainedFatGram', 0.0);
+
+    // Set the daily macronutrients limits in gram
     await prefs.setDouble(
-        'carbsGramLimit',
-        carbsGramLimit ??
-            550.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+        'carbsGramLimit', _nutritionController.carbsLimit.value);
     await prefs.setDouble(
-        'proteinGramLimit',
-        proteinGramLimit ??
-            1200.0); // todo: get the value from AI tool and remove the conditional statement afterwards
-    await prefs.setDouble(
-        'fatGramLimit',
-        fatGramLimit ??
-            150.0); // todo: get the value from AI tool and remove the conditional statement afterwards
+        'proteinGramLimit', _nutritionController.proteinLimit.value);
+    await prefs.setDouble('fatGramLimit', _nutritionController.fatLimit.value);
 
     await prefs.setBool('userHasFilledInfoForm', true);
   }
@@ -245,6 +234,21 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
               child: ElevatedButton(
                 onPressed: isSelectionComplete
                     ? () async {
+                        bodyMassIndexLevel = calculateBodyMassIndex(
+                          kgWeight: selectedWeight!,
+                          cmHeight: selectedHeight!,
+                        );
+                        await _nutritionController.getBMIAdvice(
+                          bmi: bodyMassIndexLevel!,
+                          gender: selectedSex!,
+                          age: selectedAge!,
+                        );
+                        await _nutritionController.calculateNutritionLimits(
+                          age: selectedAge!,
+                          gender: selectedSex!,
+                          height: selectedHeight!,
+                          weight: selectedWeight!,
+                        );
                         _saveDataToSharedPrefs();
                         return await Get.off(() => const RegisterPage());
                       }

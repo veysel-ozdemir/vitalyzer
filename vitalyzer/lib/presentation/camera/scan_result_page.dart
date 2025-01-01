@@ -5,7 +5,9 @@ import 'package:vitalyzer/controller/scan_controller.dart';
 import 'package:vitalyzer/presentation/page/home_page.dart';
 
 class ScanResultPage extends GetView<ScanController> {
-  const ScanResultPage({super.key});
+  final _scrollController = ScrollController();
+
+  ScanResultPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,16 +25,42 @@ class ScanResultPage extends GetView<ScanController> {
                   color: ColorPalette.lightGreen,
                 ),
               )
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(20.0),
+            : Padding(
+                padding: const EdgeInsets.all(25),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      controller.analysisResult.value,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: ColorPalette.green,
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: ColorPalette.lightGreen.withOpacity(0.5),
+                        border: Border.all(
+                            color: ColorPalette.lightGreen, width: 3),
+                      ),
+                      height: Get.height * 0.5,
+                      width: Get.width,
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        scrollbarOrientation: ScrollbarOrientation.right,
+                        trackVisibility: true,
+                        interactive: true,
+                        thickness: 6,
+                        radius: const Radius.circular(30),
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                controller.analysisResult.value,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: ColorPalette.green,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 30),

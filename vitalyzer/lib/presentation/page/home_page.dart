@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/controller/nutrition_controller.dart';
 import 'package:vitalyzer/presentation/camera/camera_screen.dart';
 import 'package:vitalyzer/presentation/page/analysis_page.dart';
 import 'package:vitalyzer/presentation/page/food_drink_search_page.dart';
@@ -41,8 +42,12 @@ class _HomePageState extends State<HomePage> {
   double? gainedCarbsGram;
   double? gainedProteinGram;
   double? gainedFatGram;
+  int? carbsCaloriePerGram;
+  int? proteinCaloriePerGram;
+  int? fatCaloriePerGram;
   List<bool> waterBottleItemStates = []; // Pressed states of items
   late SharedPreferences prefs;
+  final NutritionController _nutritionController = Get.find();
 
   String greeting = '';
   late Timer timer;
@@ -93,6 +98,10 @@ class _HomePageState extends State<HomePage> {
       waterBottleItemStates = savedStates != null
           ? savedStates.map((e) => e == 'true').toList()
           : List.generate(waterBottleItemCount, (_) => false);
+
+      carbsCaloriePerGram = prefs.getInt('carbsCaloriePerGram');
+      proteinCaloriePerGram = prefs.getInt('proteinCaloriePerGram');
+      fatCaloriePerGram = prefs.getInt('fatCaloriePerGram');
     });
   }
 
@@ -244,6 +253,9 @@ class _HomePageState extends State<HomePage> {
                                     context: context,
                                     onNutritionLimitUpdate:
                                         (calorieLimit) async {
+                                      await _nutritionController
+                                          .getMacroDistribution(calorieLimit);
+
                                       setState(() {
                                         dailyCalorieLimit = calorieLimit;
                                         gainedCalories = 0.0;
@@ -253,8 +265,24 @@ class _HomePageState extends State<HomePage> {
                                         gainedCarbsGram = 0.0;
                                         gainedProteinGram = 0.0;
                                         gainedFatGram = 0.0;
+                                        // set the calorie limits of each macronutrient
+                                        carbsCalorieLimit = _nutritionController
+                                            .carbsCalories.value;
+                                        proteinCalorieLimit =
+                                            _nutritionController
+                                                .proteinCalories.value;
+                                        fatCalorieLimit = _nutritionController
+                                            .fatCalories.value;
+                                        // calculate the gram limits of each macronutrient
+                                        carbsGramLimit = carbsCalorieLimit! /
+                                            carbsCaloriePerGram!;
+                                        proteinGramLimit =
+                                            proteinCalorieLimit! /
+                                                proteinCaloriePerGram!;
+                                        fatGramLimit = fatCalorieLimit! /
+                                            fatCaloriePerGram!;
                                       });
-                                      // todo: get the new gram and calorie limit values of each macronutrients according to the customized calorie limit from the AI tool
+
                                       await _updateCalorieLimitData();
                                     },
                                   ),
