@@ -6,6 +6,7 @@ import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/presentation/page/user_info_fill_page.dart';
 import 'package:vitalyzer/util/extension.dart';
+import 'package:vitalyzer/service/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,6 +20,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
 
   void _toggleVisibility() {
     setState(() {
@@ -44,6 +47,28 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    setState(() => _isLoading = true);
+
+    try {
+      await _authService.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      await Get.offAll(() => const HomePage());
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -215,20 +240,22 @@ class _LoginPageState extends State<LoginPage> {
             Column(
               children: [
                 ElevatedButton(
-                  onPressed: () async =>
-                      await Get.offAll(() => const HomePage()),
+                  onPressed: _isLoading ? null : _handleLogin,
                   style: ButtonStyle(
                     backgroundColor:
                         const WidgetStatePropertyAll(ColorPalette.green),
                     fixedSize: WidgetStatePropertyAll(
                         Size.fromWidth(deviceSize.width * 0.5)),
                   ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(
-                      color: ColorPalette.beige,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(
+                          color: ColorPalette.beige)
+                      : const Text(
+                          'Login',
+                          style: TextStyle(
+                            color: ColorPalette.beige,
+                          ),
+                        ),
                 ),
                 TextButton(
                   onPressed: userHasFilled

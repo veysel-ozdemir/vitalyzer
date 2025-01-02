@@ -45,3 +45,8 @@ app.*.map.json
 # Custom files
 *.DS_Store
 *.env
+firebase.json
+firepit-log.txt
+firebase_options.dart
+google-services.json
+GoogleService-Info.plist

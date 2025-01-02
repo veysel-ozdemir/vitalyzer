@@ -30,6 +30,10 @@ dependencies:
   csv: ^6.0.0
   flutter_dotenv: ^5.2.1
   google_generative_ai: ^0.4.6
+  firebase_core: ^3.9.0
+  firebase_auth: ^5.3.4
+  cloud_firestore: ^5.6.0
+  firebase_storage: ^12.3.7
 
 dev_dependencies:
   flutter_test:

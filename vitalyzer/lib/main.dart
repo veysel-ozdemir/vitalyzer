@@ -5,9 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/app/app.dart';
 import 'package:vitalyzer/db/local/database_helper.dart';
 import 'package:vitalyzer/util/funtions.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp();
 
   // Load the .env file
   await dotenv.load(fileName: ".env");
