@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/controller/user_nutrition_controller.dart';
+import 'package:vitalyzer/controller/user_profile_controller.dart';
+import 'package:vitalyzer/model/user_profile.dart';
 import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/presentation/page/user_info_fill_page.dart';
@@ -22,6 +26,9 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
   bool _isLoading = false;
+  late SharedPreferences prefs;
+  final UserProfileController userProfileController = Get.find();
+  final UserNutritionController userNutritionController = Get.find();
 
   void _toggleVisibility() {
     setState(() {
@@ -36,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _loadSharedPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     setState(() {
       userHasFilled = prefs.getBool('userHasFilledInfoForm') ?? false;
     });
@@ -53,11 +60,17 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      await _authService.signIn(
+      UserCredential userCredential = await _authService.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      debugPrint('Authenticated user uid: ${userCredential.user!.uid}');
+      debugPrint('Authenticated user email: ${userCredential.user!.email}');
 
+      // Initialize user data after successful login
+      await _authService.initializeUserData(userCredential);
+
+      await prefs.setBool('hasActiveSession', true);
       await Get.offAll(() => const HomePage());
     } catch (e) {
       Get.snackbar(
@@ -66,6 +79,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+      debugPrint('Error: ${e.toString()}');
     } finally {
       setState(() => _isLoading = false);
     }

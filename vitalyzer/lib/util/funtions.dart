@@ -1,6 +1,21 @@
+import 'dart:io';
+
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Initialize the essentials
+Future<void> initSharedPrefData(SharedPreferences prefs) async {
+  // Set the standard kcal/g of macronutrients (4-4-9)
+  await prefs.setInt('carbsCaloriePerGram', 4);
+  await prefs.setInt('proteinCaloriePerGram', 4);
+  await prefs.setInt('fatCaloriePerGram', 9);
+  // Set determined water bottle capacity
+  await prefs.setDouble('waterBottleCapacity', 0.5);
+}
 
 // calculate the body mass index (BMI) in kg & cm
 double calculateBodyMassIndex({
@@ -71,4 +86,25 @@ Future<List<Map<String, dynamic>>> parseCsv(String path) async {
     debugPrint('Stack trace: $stackTrace');
     rethrow;
   }
+}
+
+// convert image to bytes
+Future<Uint8List> convertXFileToUint8List(XFile image) async =>
+    await image.readAsBytes();
+
+// convert bytes to image
+Future<XFile> convertUint8ListToXFile(
+    Uint8List uint8List, String fileName) async {
+  // Get the temporary directory manually
+  String tempDirPath = Directory.systemTemp.path;
+
+  // Combine the temporary directory path with the file name
+  String filePath = path.join(tempDirPath, fileName);
+
+  // Create a temporary file and write the Uint8List to it
+  File tempFile = File(filePath);
+  await tempFile.writeAsBytes(uint8List);
+
+  // Return the file as an XFile
+  return XFile(tempFile.path);
 }

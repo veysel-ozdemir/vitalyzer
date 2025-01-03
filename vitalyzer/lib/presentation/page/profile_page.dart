@@ -11,6 +11,7 @@ import 'package:vitalyzer/controller/permission_controller.dart';
 import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/landing_page.dart';
 import 'package:vitalyzer/presentation/widget/user_info_item.dart';
+import 'package:vitalyzer/service/auth_service.dart';
 import 'package:vitalyzer/util/extension.dart';
 import 'package:vitalyzer/util/funtions.dart';
 
@@ -32,6 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final ImagePicker _imagePicker = ImagePicker();
   final PermissionController permissionController = Get.find();
   final NutritionController nutritionController = Get.find();
+  final AuthService _authService = AuthService();
 
   late SharedPreferences prefs;
   String? selectedSex;
@@ -101,7 +103,7 @@ class _ProfilePageState extends State<ProfilePage> {
     switch (value) {
       case 'Log Out':
         // todo: log out
-        return await Get.offAll(() => const LandingPage());
+        _logOutDialog();
       case 'Delete Account':
         // todo: delete account
         _deleteAccountDialog();
@@ -1223,6 +1225,67 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () => Get.back(),
               child: const Text(
                 'Delete',
+                style: TextStyle(color: ColorPalette.darkGreen),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _logOutDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: ColorPalette.beige,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(
+              width: 3,
+              color: ColorPalette.lightGreen,
+            ),
+          ),
+          title: const Text(
+            'Log Out',
+            style: TextStyle(color: ColorPalette.darkGreen),
+            textAlign: TextAlign.center,
+          ),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Divider(
+                color: ColorPalette.lightGreen,
+                thickness: 2,
+              ),
+              SizedBox(height: 15),
+              Text(
+                'Do you want to log out from the session?\n\nConsider that your nutrition data will be stored only on this physical device. You can access your data by logging in again to continue using it.',
+                style: TextStyle(color: ColorPalette.darkGreen),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: ColorPalette.darkGreen),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _authService.signOut();
+
+                prefs.setBool('userHasFilledInfoForm', false);
+                prefs.setBool('hasActiveSession', false);
+
+                await Get.offAll(() => const LandingPage());
+              },
+              child: const Text(
+                'Log out',
                 style: TextStyle(color: ColorPalette.darkGreen),
               ),
             ),

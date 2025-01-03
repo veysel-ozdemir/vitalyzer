@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vitalyzer/config/global_bindings.dart';
-import 'package:vitalyzer/presentation/page/landing_page.dart';
 
 class VitalyzerApp extends StatefulWidget {
-  const VitalyzerApp({super.key});
+  final Widget startingPage;
+
+  const VitalyzerApp({super.key, required this.startingPage});
 
   @override
   State<VitalyzerApp> createState() => _VitalyzerAppState();
@@ -20,7 +21,7 @@ class _VitalyzerAppState extends State<VitalyzerApp> {
         textTheme: GoogleFonts.youngSerifTextTheme(),
       ),
       initialBinding: GlobalBindings(),
-      home: const LandingPage(),
+      home: widget.startingPage,
     );
   }
 }

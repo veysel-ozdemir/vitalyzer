@@ -23,8 +23,9 @@ class DatabaseHelper {
     final path = join(dbPath, 'vitalyzer_app_database.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -32,9 +33,19 @@ class DatabaseHelper {
     // Create Food Table
     await createFoodTable(db);
 
-    // todo: create UserProfile table, including profile photo
+    // Create UserProfile table
+    await createUserProfileTable(db);
 
-    // todo: create UserNutrition table, including date and time
+    // Create UserNutrition table
+    await createUserNutritionTable(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Create new tables that were added after version 1
+      await createUserProfileTable(db);
+      await createUserNutritionTable(db);
+    }
   }
 
   Future<void> createFoodTable(Database db) async {
@@ -80,6 +91,51 @@ class DatabaseHelper {
     ''');
   }
 
+  Future<void> createUserProfileTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE UserProfile (
+        UserId INTEGER PRIMARY KEY AUTOINCREMENT,
+        FirebaseUserUid TEXT NOT NULL,
+        FullName TEXT NOT NULL,
+        Email TEXT NOT NULL,
+        ProfilePhoto BLOB,
+        Height INTEGER NOT NULL,
+        Weight REAL NOT NULL,
+        Age INTEGER NOT NULL,
+        Gender TEXT NOT NULL,
+        CreatedAt TEXT NOT NULL,
+        UpdatedAt TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> createUserNutritionTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE UserNutrition (
+        NutritionId INTEGER PRIMARY KEY AUTOINCREMENT,
+        UserId INTEGER NOT NULL,
+        Date TEXT NOT NULL,
+        GainedCarbsCalorie REAL NOT NULL,
+        GainedProteinCalorie REAL NOT NULL,
+        GainedFatCalorie REAL NOT NULL,
+        GainedCarbsGram REAL NOT NULL,
+        GainedProteinGram REAL NOT NULL,
+        GainedFatGram REAL NOT NULL,
+        ConsumedWater REAL NOT NULL,
+        WaterLimit REAL NOT NULL,
+        CarbsGramLimit REAL NOT NULL,
+        ProteinGramLimit REAL NOT NULL,
+        FatGramLimit REAL NOT NULL,
+        CarbsCalorieLimit REAL NOT NULL,
+        ProteinCalorieLimit REAL NOT NULL,
+        FatCalorieLimit REAL NOT NULL,
+        BmiLevel REAL NOT NULL,
+        BmiAdvice TEXT,
+        FOREIGN KEY (UserId) REFERENCES UserProfile(UserId)
+      )
+    ''');
+  }
+
   Future<void> insertFoodData(List<Map<String, dynamic>> foodData) async {
     final db = await DatabaseHelper().database;
 
@@ -109,5 +165,13 @@ class DatabaseHelper {
       return result.first;
     }
     return null;
+  }
+
+  Future<bool> isTableExists(String tableName) async {
+    final db = await database;
+    final result = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='$tableName';");
+    debugPrint('Checking if table $tableName exists: ${result.isNotEmpty}');
+    return result.isNotEmpty;
   }
 }

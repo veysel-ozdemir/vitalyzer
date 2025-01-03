@@ -6,11 +6,20 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vitalyzer/service/nutrition_storage_service.dart';
+import 'package:vitalyzer/util/funtions.dart';
+import 'package:vitalyzer/controller/user_profile_controller.dart';
+import 'package:vitalyzer/controller/user_nutrition_controller.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  final userProfileController = Get.find<UserProfileController>();
+  final userNutritionController = Get.find<UserNutritionController>();
 
   // Get current user
   User? get currentUser => _auth.currentUser;
@@ -67,16 +76,37 @@ class AuthService {
     }
   }
 
+  Future<void> initializeUserData(UserCredential userCredential) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Store Firebase UID
+    await prefs.setString('userFirebaseUid', userCredential.user!.uid);
+
+    // Get user profile from local database
+    await userProfileController.loadUserProfile(userCredential.user!.uid);
+
+    final userProfile = userProfileController.currentProfile.value;
+    if (userProfile != null) {
+      // Store user profile ID
+      await prefs.setInt('userProfileId', userProfile.userId!);
+
+      // Initialize nutrition data
+      await userNutritionController
+          .initializeUserNutritionData(userProfile.userId!);
+    }
+  }
+
   // Sign In
   Future<UserCredential> signIn({
     required String email,
     required String password,
   }) async {
     try {
-      return await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      return userCredential;
     } catch (e) {
       rethrow;
     }
@@ -84,6 +114,22 @@ class AuthService {
 
   // Sign Out
   Future<void> signOut() async {
-    await _auth.signOut();
+    try {
+      // Store nutrition data before logging out
+      await NutritionStorageService().storeCurrentDayNutrition(
+          DateFormat('yyyy-MM-dd').format(DateTime.now()));
+
+      final prefs = await SharedPreferences.getInstance();
+      // Clear shared preferences
+      await prefs.clear();
+      // Initialize essential shared preferences data
+      initSharedPrefData(prefs);
+
+      // Sign out from Firebase
+      await _auth.signOut();
+    } catch (e) {
+      debugPrint('Error during sign out: $e');
+      rethrow;
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/nutrition_controller.dart';
+import 'package:vitalyzer/controller/user_profile_controller.dart';
+import 'package:vitalyzer/model/user_profile.dart';
 import 'package:vitalyzer/presentation/camera/camera_screen.dart';
 import 'package:vitalyzer/presentation/page/analysis_page.dart';
 import 'package:vitalyzer/presentation/page/food_drink_search_page.dart';
@@ -14,6 +17,8 @@ import 'package:vitalyzer/presentation/widget/grid_item.dart';
 import 'package:vitalyzer/presentation/widget/nutrient_bar_chart.dart';
 import 'package:vitalyzer/presentation/widget/nutrient_pie_chart.dart';
 import 'package:vitalyzer/util/extension.dart';
+import 'package:intl/intl.dart';
+import 'package:vitalyzer/service/nutrition_storage_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,7 +29,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int waterBottleItemCount = 0;
-
+  int? currentUserProfileId;
+  String? currentUserFirebaseUid;
   double? waterBottleCapacity;
   double? dailyWaterLimit;
   int drankWaterBottle = 0;
@@ -46,25 +52,35 @@ class _HomePageState extends State<HomePage> {
   int? proteinCaloriePerGram;
   int? fatCaloriePerGram;
   List<bool> waterBottleItemStates = []; // Pressed states of items
+  UserProfile? currentUserProfile;
+  Uint8List? userProfilePhoto;
   late SharedPreferences prefs;
   final NutritionController _nutritionController = Get.find();
+  final UserProfileController _userProfileController = Get.find();
 
   String greeting = '';
   late Timer timer;
+  Timer? _dayCheckTimer;
+  String _currentDay = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  final NutritionStorageService _nutritionStorage = NutritionStorageService();
 
   @override
   void initState() {
     super.initState();
-    _loadSharedPrefs(); // Load persisted value when page initializes
+    _loadSharedPrefsAndUserProfileData();
     _updateGreeting();
     timer = Timer.periodic(const Duration(minutes: 1), (timer) {
       _updateGreeting();
     });
+    _startDayChangeCheck();
   }
 
-  Future<void> _loadSharedPrefs() async {
+  Future<void> _loadSharedPrefsAndUserProfileData() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
+      currentUserProfileId = prefs.getInt('userProfileId');
+      currentUserFirebaseUid = prefs.getString('userFirebaseUid');
+
       dailyWaterLimit = prefs.getDouble('dailyWaterLimit');
       waterBottleCapacity = prefs.getDouble('waterBottleCapacity');
 
@@ -103,6 +119,31 @@ class _HomePageState extends State<HomePage> {
       proteinCaloriePerGram = prefs.getInt('proteinCaloriePerGram');
       fatCaloriePerGram = prefs.getInt('fatCaloriePerGram');
     });
+
+    // load current user profile
+    await _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    debugPrint('Loading user profile from local database');
+
+    _userProfileController.loadUserProfile(currentUserFirebaseUid!);
+
+    setState(() {
+      currentUserProfile = _userProfileController.currentProfile.value;
+    });
+
+    if (currentUserProfile != null) {
+      debugPrint(
+          'Successfully loaded current user profile from local database');
+
+      setState(() {
+        userProfilePhoto = currentUserProfile!.profilePhoto;
+      });
+    } else {
+      debugPrint('Could not fetch current user profile from local database');
+      debugPrint('currentUserFirebaseUid: $currentUserFirebaseUid');
+    }
   }
 
   Future<void> _saveWaterData() async {
@@ -171,9 +212,22 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _startDayChangeCheck() {
+    // Check every minute
+    _dayCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      final newDay = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      if (newDay != _currentDay) {
+        // Day has changed
+        _nutritionStorage.storeCurrentDayNutrition(_currentDay);
+        _currentDay = newDay;
+      }
+    });
+  }
+
   @override
   void dispose() {
     timer.cancel();
+    _dayCheckTimer?.cancel();
     super.dispose();
   }
 
@@ -190,7 +244,7 @@ class _HomePageState extends State<HomePage> {
             ) // Show a loader
           : Padding(
               padding: const EdgeInsets.only(
-                  top: 50, bottom: 25, right: 25, left: 25),
+                  top: 50, bottom: 25, right: 20, left: 20),
               child: LayoutBuilder(
                 builder: (context, constraints) => Column(
                   children: [
@@ -213,12 +267,18 @@ class _HomePageState extends State<HomePage> {
                                         fontSize: 20,
                                       ),
                                     ),
-                                    Text(
-                                      'Leonardo!',
-                                      style: TextStyle(
-                                        color: ColorPalette.darkGreen
-                                            .withOpacity(0.75),
-                                        fontSize: 36,
+                                    SizedBox(
+                                      width: Get.width * 0.5,
+                                      child: Text(
+                                        (currentUserProfile != null)
+                                            ? '${currentUserProfile!.fullName}!'
+                                            : 'Friend!',
+                                        style: TextStyle(
+                                          color: ColorPalette.darkGreen
+                                              .withOpacity(0.75),
+                                          fontSize: 36,
+                                        ),
+                                        overflow: TextOverflow.clip,
                                       ),
                                     ),
                                   ],
@@ -229,17 +289,35 @@ class _HomePageState extends State<HomePage> {
                                   child: Container(
                                     alignment: Alignment.center,
                                     child: Container(
-                                      padding: const EdgeInsets.all(10),
+                                      height: Get.width * 0.3,
+                                      width: Get.width * 0.3,
                                       decoration: BoxDecoration(
+                                        color: ColorPalette.lightGreen
+                                            .withOpacity(0.5),
                                         shape: BoxShape.circle,
                                         border: Border.all(
                                           color: ColorPalette.darkGreen,
                                           width: 3,
                                         ),
                                       ),
-                                      child: FlutterLogo(
-                                        size: deviceSize.height * 0.05,
-                                      ),
+                                      child: (userProfilePhoto != null)
+                                          ? ClipOval(
+                                              child: Image.memory(
+                                                userProfilePhoto!,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            )
+                                          : Center(
+                                              child: IconButton(
+                                                onPressed: null,
+                                                enableFeedback: false,
+                                                icon: Icon(
+                                                  Icons.person,
+                                                  size: Get.width * 0.2,
+                                                  color: ColorPalette.green,
+                                                ),
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ),
