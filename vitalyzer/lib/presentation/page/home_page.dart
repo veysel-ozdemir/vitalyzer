@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadUserProfile() async {
     debugPrint('Loading user profile from local database');
 
-    _userProfileController.loadUserProfile(currentUserFirebaseUid!);
+    await _userProfileController.loadUserProfile(currentUserFirebaseUid!);
 
     setState(() {
       currentUserProfile = _userProfileController.currentProfile.value;
