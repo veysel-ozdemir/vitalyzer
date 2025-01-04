@@ -93,6 +93,8 @@ class AuthService {
       // Initialize nutrition data
       await userNutritionController
           .initializeUserNutritionData(userProfile.userId!);
+    } else {
+      debugPrint('User profile not found');
     }
   }
 
@@ -123,7 +125,7 @@ class AuthService {
       // Clear shared preferences
       await prefs.clear();
       // Initialize essential shared preferences data
-      initSharedPrefData(prefs);
+      await initSharedPrefData(prefs);
 
       // Sign out from Firebase
       await _auth.signOut();

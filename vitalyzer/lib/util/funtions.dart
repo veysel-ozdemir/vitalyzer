@@ -17,6 +17,13 @@ Future<void> initSharedPrefData(SharedPreferences prefs) async {
   await prefs.setDouble('waterBottleCapacity', 0.5);
 }
 
+// Print each key-value pairs of Shared Prefs
+void printKeyValueOfSharedPrefs(SharedPreferences prefs) {
+  for (var k in prefs.getKeys()) {
+    debugPrint('$k: ${prefs.get(k)}');
+  }
+}
+
 // calculate the body mass index (BMI) in kg & cm
 double calculateBodyMassIndex({
   required double kgWeight,

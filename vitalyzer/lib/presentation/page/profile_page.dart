@@ -1277,7 +1277,13 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             TextButton(
               onPressed: () async {
+                debugPrint('\nShared Prefs before sign out:');
+                printKeyValueOfSharedPrefs(prefs);
+
                 await _authService.signOut();
+
+                debugPrint('\nShared Prefs after sign out:');
+                printKeyValueOfSharedPrefs(prefs);
 
                 prefs.setBool('userHasFilledInfoForm', false);
                 prefs.setBool('hasActiveSession', false);

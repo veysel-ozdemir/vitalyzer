@@ -28,32 +28,51 @@ class NutritionStorageService {
     );
 
     // If nutrition data already exists, update it. Otherwise, create new entry
-    final UserNutrition nutritionData = UserNutrition(
-      nutritionId: existingNutrition?.nutritionId,
-      userId: userProfileId,
-      date: DateTime.parse(today),
-      gainedCarbsCalorie: prefs.getDouble('gainedCarbsCalorie') ?? 0.0,
-      gainedProteinCalorie: prefs.getDouble('gainedProteinCalorie') ?? 0.0,
-      gainedFatCalorie: prefs.getDouble('gainedFatCalorie') ?? 0.0,
-      gainedCarbsGram: prefs.getDouble('gainedCarbsGram') ?? 0.0,
-      gainedProteinGram: prefs.getDouble('gainedProteinGram') ?? 0.0,
-      gainedFatGram: prefs.getDouble('gainedFatGram') ?? 0.0,
-      consumedWater: prefs.getDouble('consumedWater') ?? 0.0,
-      waterLimit: prefs.getDouble('dailyWaterLimit') ?? 0.0,
-      carbsGramLimit: prefs.getDouble('carbsGramLimit') ?? 0.0,
-      proteinGramLimit: prefs.getDouble('proteinGramLimit') ?? 0.0,
-      fatGramLimit: prefs.getDouble('fatGramLimit') ?? 0.0,
-      carbsCalorieLimit: prefs.getDouble('carbsCalorieLimit') ?? 0.0,
-      proteinCalorieLimit: prefs.getDouble('proteinCalorieLimit') ?? 0.0,
-      fatCalorieLimit: prefs.getDouble('fatCalorieLimit') ?? 0.0,
-      bmiLevel: prefs.getDouble('bodyMassIndexLevel') ?? 0.0,
-      bmiAdvice: prefs.getString('bmiAdvice'),
-    );
-
     if (existingNutrition != null) {
-      await _nutritionController.updateUserNutrition(nutritionData);
+      await _nutritionController.updateUserNutrition(UserNutrition(
+        nutritionId: existingNutrition.nutritionId,
+        userId: userProfileId,
+        date: DateTime.parse(today),
+        gainedCarbsCalorie: prefs.getDouble('gainedCarbsCalorie') ?? 0.0,
+        gainedProteinCalorie: prefs.getDouble('gainedProteinCalorie') ?? 0.0,
+        gainedFatCalorie: prefs.getDouble('gainedFatCalorie') ?? 0.0,
+        gainedCarbsGram: prefs.getDouble('gainedCarbsGram') ?? 0.0,
+        gainedProteinGram: prefs.getDouble('gainedProteinGram') ?? 0.0,
+        gainedFatGram: prefs.getDouble('gainedFatGram') ?? 0.0,
+        consumedWater: (prefs.getInt('drankWaterBottle')! *
+            prefs.getDouble('waterBottleCapacity')!),
+        waterLimit: prefs.getDouble('dailyWaterLimit') ?? 0.0,
+        carbsGramLimit: prefs.getDouble('carbsGramLimit') ?? 0.0,
+        proteinGramLimit: prefs.getDouble('proteinGramLimit') ?? 0.0,
+        fatGramLimit: prefs.getDouble('fatGramLimit') ?? 0.0,
+        carbsCalorieLimit: prefs.getDouble('carbsCalorieLimit') ?? 0.0,
+        proteinCalorieLimit: prefs.getDouble('proteinCalorieLimit') ?? 0.0,
+        fatCalorieLimit: prefs.getDouble('fatCalorieLimit') ?? 0.0,
+        bmiLevel: prefs.getDouble('bodyMassIndexLevel') ?? 0.0,
+        bmiAdvice: prefs.getString('bmiAdvice'),
+      ));
     } else {
-      await _nutritionController.createUserNutrition(nutritionData);
+      await _nutritionController.createUserNutrition(UserNutrition(
+        userId: userProfileId,
+        date: DateTime.parse(today),
+        gainedCarbsCalorie: prefs.getDouble('gainedCarbsCalorie') ?? 0.0,
+        gainedProteinCalorie: prefs.getDouble('gainedProteinCalorie') ?? 0.0,
+        gainedFatCalorie: prefs.getDouble('gainedFatCalorie') ?? 0.0,
+        gainedCarbsGram: prefs.getDouble('gainedCarbsGram') ?? 0.0,
+        gainedProteinGram: prefs.getDouble('gainedProteinGram') ?? 0.0,
+        gainedFatGram: prefs.getDouble('gainedFatGram') ?? 0.0,
+        consumedWater: (prefs.getInt('drankWaterBottle')! *
+            prefs.getDouble('waterBottleCapacity')!),
+        waterLimit: prefs.getDouble('dailyWaterLimit') ?? 0.0,
+        carbsGramLimit: prefs.getDouble('carbsGramLimit') ?? 0.0,
+        proteinGramLimit: prefs.getDouble('proteinGramLimit') ?? 0.0,
+        fatGramLimit: prefs.getDouble('fatGramLimit') ?? 0.0,
+        carbsCalorieLimit: prefs.getDouble('carbsCalorieLimit') ?? 0.0,
+        proteinCalorieLimit: prefs.getDouble('proteinCalorieLimit') ?? 0.0,
+        fatCalorieLimit: prefs.getDouble('fatCalorieLimit') ?? 0.0,
+        bmiLevel: prefs.getDouble('bodyMassIndexLevel') ?? 0.0,
+        bmiAdvice: prefs.getString('bmiAdvice'),
+      ));
     }
 
     // Reset daily values after storing
@@ -67,6 +86,6 @@ class NutritionStorageService {
     await prefs.setDouble('gainedCarbsGram', 0.0);
     await prefs.setDouble('gainedProteinGram', 0.0);
     await prefs.setDouble('gainedFatGram', 0.0);
-    await prefs.setDouble('consumedWater', 0.0);
+    await prefs.setInt('drankWaterBottle', 0);
   }
 }

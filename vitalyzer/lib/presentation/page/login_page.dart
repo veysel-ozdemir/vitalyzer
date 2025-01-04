@@ -5,12 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/user_nutrition_controller.dart';
 import 'package:vitalyzer/controller/user_profile_controller.dart';
-import 'package:vitalyzer/model/user_profile.dart';
 import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/presentation/page/user_info_fill_page.dart';
 import 'package:vitalyzer/util/extension.dart';
 import 'package:vitalyzer/service/auth_service.dart';
+import 'package:vitalyzer/util/funtions.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -60,6 +60,9 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
+      debugPrint('\nShared Prefs before sign in:');
+      printKeyValueOfSharedPrefs(prefs);
+
       UserCredential userCredential = await _authService.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
@@ -67,10 +70,16 @@ class _LoginPageState extends State<LoginPage> {
       debugPrint('Authenticated user uid: ${userCredential.user!.uid}');
       debugPrint('Authenticated user email: ${userCredential.user!.email}');
 
+      debugPrint('\nShared Prefs after sign in:');
+      printKeyValueOfSharedPrefs(prefs);
+
       // Initialize user data after successful login
       await _authService.initializeUserData(userCredential);
 
       await prefs.setBool('hasActiveSession', true);
+
+      debugPrint('\nShared Prefs before home:');
+      printKeyValueOfSharedPrefs(prefs);
       await Get.offAll(() => const HomePage());
     } catch (e) {
       Get.snackbar(

@@ -23,6 +23,8 @@ void main() async {
   // Load shared preferences data
   final prefs = await SharedPreferences.getInstance();
   await initSharedPrefData(prefs);
+  debugPrint('\nShared Prefs after init:');
+  printKeyValueOfSharedPrefs(prefs);
   // Get database status
   final bool? dbStatus = prefs.getBool('isDBInitialized');
 

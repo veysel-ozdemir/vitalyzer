@@ -123,8 +123,11 @@ class UserNutritionController extends GetxController {
         debugPrint('Found existing nutrition data for today');
         // Update SharedPreferences with today's data
         final prefs = await SharedPreferences.getInstance();
+
         final waterBottleCapacity = prefs.getDouble('waterBottleCapacity');
-        final dailyWaterLimit = prefs.getDouble('dailyWaterLimit');
+
+        final dailyWaterLimit = todayNutrition.waterLimit;
+        await prefs.setDouble('dailyWaterLimit', dailyWaterLimit);
 
         // Set gained values
         await prefs.setDouble(
@@ -146,7 +149,7 @@ class UserNutritionController extends GetxController {
 
         // Set the water states
         final waterBottleItemCount =
-            (dailyWaterLimit! / waterBottleCapacity).toInt();
+            (dailyWaterLimit / waterBottleCapacity).toInt();
         await prefs.setStringList(
             'waterBottleItemStates',
             List.generate(waterBottleItemCount, (_) {
