@@ -198,20 +198,39 @@ class _RegisterPageState extends State<RegisterPage> {
             Container(
               alignment: Alignment.center,
               child: Container(
-                padding: const EdgeInsets.all(10),
+                height: Get.width * 0.25,
+                width: Get.width * 0.25,
                 decoration: BoxDecoration(
+                  color: ColorPalette.lightGreen.withOpacity(0.5),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: ColorPalette.green,
+                    color: ColorPalette.darkGreen,
                     width: 3,
                   ),
                 ),
-                child: FlutterLogo(
-                  size: deviceSize.height * 0.05,
+                child: Center(
+                  child: IconButton(
+                    onPressed: null,
+                    enableFeedback: false,
+                    icon: Icon(
+                      Icons.health_and_safety,
+                      size: Get.width * 0.175,
+                      color: ColorPalette.green,
+                    ),
+                  ),
                 ),
               ),
             ),
-            const Spacer(flex: 1),
+            const Padding(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "Almost Done!",
+                style: TextStyle(
+                  color: ColorPalette.darkGreen,
+                  fontSize: 25,
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(25),
               child: TextFormField(
@@ -419,25 +438,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 color: ColorPalette.green.withOpacity(0.75),
               ),
             ),
-            const Spacer(flex: 1),
-            Container(
-              padding: const EdgeInsets.all(10),
-              alignment: Alignment.center,
-              child: Container(
-                alignment: Alignment.center,
-                width: deviceSize.width,
-                height: deviceSize.height * 0.15,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  border: Border.all(
-                    color: ColorPalette.green,
-                    width: 3,
-                  ),
-                ),
-                child: const Text('Illustration'),
-              ),
-            ),
+            const Spacer(flex: 2),
             Column(
               children: [
                 ElevatedButton(

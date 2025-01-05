@@ -50,16 +50,26 @@ class _LandingPageState extends State<LandingPage> {
               Container(
                 alignment: Alignment.centerLeft,
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  height: Get.width * 0.3,
+                  width: Get.width * 0.3,
                   decoration: BoxDecoration(
+                    color: ColorPalette.lightGreen.withOpacity(0.5),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: ColorPalette.green,
+                      color: ColorPalette.darkGreen,
                       width: 3,
                     ),
                   ),
-                  child: FlutterLogo(
-                    size: deviceSize.height * 0.1,
+                  child: Center(
+                    child: IconButton(
+                      onPressed: null,
+                      enableFeedback: false,
+                      icon: Icon(
+                        Icons.health_and_safety,
+                        size: Get.width * 0.2,
+                        color: ColorPalette.green,
+                      ),
+                    ),
                   ),
                 ),
               ),

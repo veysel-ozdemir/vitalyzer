@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/nutrition_controller.dart';
 import 'package:vitalyzer/controller/permission_controller.dart';
+import 'package:vitalyzer/controller/user_profile_controller.dart';
+import 'package:vitalyzer/model/user_profile.dart';
 import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/landing_page.dart';
 import 'package:vitalyzer/presentation/widget/user_info_item.dart';
@@ -52,6 +55,13 @@ class _ProfilePageState extends State<ProfilePage> {
   int? proteinCaloriePerGram;
   int? fatCaloriePerGram;
 
+  int? currentUserProfileId;
+  String? currentUserFirebaseUid;
+  UserProfile? currentUserProfile;
+  Uint8List? userProfilePhoto;
+
+  final UserProfileController _userProfileController = Get.find();
+
   // todo: get the current values of following variables and show in text form fields
   String? userName;
   String? userEmail;
@@ -66,6 +76,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
+      currentUserProfileId = prefs.getInt('userProfileId');
+      currentUserFirebaseUid = prefs.getString('userFirebaseUid');
       selectedSex = prefs.getString('userSex');
       selectedAge = prefs.getInt('userAge');
       selectedHeight = prefs.getInt('userHeight');
@@ -82,6 +94,29 @@ class _ProfilePageState extends State<ProfilePage> {
       proteinCaloriePerGram = prefs.getInt('proteinCaloriePerGram');
       fatCaloriePerGram = prefs.getInt('fatCaloriePerGram');
     });
+    await _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    debugPrint('Loading user profile from local database');
+
+    await _userProfileController.loadUserProfile(currentUserFirebaseUid!);
+
+    setState(() {
+      currentUserProfile = _userProfileController.currentProfile.value;
+    });
+
+    if (currentUserProfile != null) {
+      debugPrint(
+          'Successfully loaded current user profile from local database');
+
+      setState(() {
+        userProfilePhoto = currentUserProfile!.profilePhoto;
+      });
+    } else {
+      debugPrint('Could not fetch current user profile from local database');
+      debugPrint('currentUserFirebaseUid: $currentUserFirebaseUid');
+    }
   }
 
   @override
@@ -201,17 +236,34 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       alignment: Alignment.center,
                       child: Container(
-                        padding: const EdgeInsets.all(10),
+                        height: Get.width * 0.3,
+                        width: Get.width * 0.3,
                         decoration: BoxDecoration(
+                          color: ColorPalette.lightGreen.withOpacity(0.5),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: ColorPalette.green,
+                            color: ColorPalette.darkGreen,
                             width: 3,
                           ),
                         ),
-                        child: FlutterLogo(
-                          size: Get.height * 0.075,
-                        ),
+                        child: (userProfilePhoto != null)
+                            ? ClipOval(
+                                child: Image.memory(
+                                  userProfilePhoto!,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Center(
+                                child: IconButton(
+                                  onPressed: null,
+                                  enableFeedback: false,
+                                  icon: Icon(
+                                    Icons.person,
+                                    size: Get.width * 0.2,
+                                    color: ColorPalette.green,
+                                  ),
+                                ),
+                              ),
                       ),
                     ),
                     Column(
