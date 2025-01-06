@@ -137,7 +137,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void _handlePopupMenuClick(String value) async {
     switch (value) {
       case 'Log Out':
-        // todo: log out
         _logOutDialog();
       case 'Delete Account':
         // todo: delete account
@@ -169,21 +168,14 @@ class _ProfilePageState extends State<ProfilePage> {
         'proteinGramLimit', nutritionController.proteinLimit.value);
     await prefs.setDouble('fatGramLimit', nutritionController.fatLimit.value);
 
-    await prefs.setInt(
-        'drankWaterBottle', 0); // todo: save current drank water bottle instead
+    await prefs.setInt('drankWaterBottle', 0);
 
-    await prefs.setDouble(
-        'gainedCarbsCalorie', 0.0); // todo: save the current gains instead
-    await prefs.setDouble(
-        'gainedProteinCalorie', 0.0); // todo: save the current gains instead
-    await prefs.setDouble(
-        'gainedFatCalorie', 0.0); // todo: save the current gains instead
-    await prefs.setDouble(
-        'gainedCarbsGram', 0.0); // todo: save the current gains instead
-    await prefs.setDouble(
-        'gainedProteinGram', 0.0); // todo: save the current gains instead
-    await prefs.setDouble(
-        'gainedFatGram', 0.0); // todo: save the current gains instead
+    await prefs.setDouble('gainedCarbsCalorie', 0.0);
+    await prefs.setDouble('gainedProteinCalorie', 0.0);
+    await prefs.setDouble('gainedFatCalorie', 0.0);
+    await prefs.setDouble('gainedCarbsGram', 0.0);
+    await prefs.setDouble('gainedProteinGram', 0.0);
+    await prefs.setDouble('gainedFatGram', 0.0);
 
     int waterBottleItemCount =
         (nutritionController.waterLimit.value / waterBottleCapacity!).toInt();
@@ -192,7 +184,7 @@ class _ProfilePageState extends State<ProfilePage> {
       List.generate(waterBottleItemCount, (_) => false)
           .map((e) => e.toString())
           .toList(),
-    ); // todo: save current water bottle states instead
+    );
   }
 
   @override

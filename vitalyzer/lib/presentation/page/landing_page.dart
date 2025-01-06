@@ -25,9 +25,6 @@ class _LandingPageState extends State<LandingPage> {
 
   Future<void> _loadSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-
-    // todo: this line is for testing, delete it later
-    // await prefs.clear();
     setState(() {
       userHasFilled = prefs.getBool('userHasFilledInfoForm') ?? false;
     });

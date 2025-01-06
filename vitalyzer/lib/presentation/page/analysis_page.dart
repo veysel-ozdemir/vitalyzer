@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
@@ -80,11 +81,13 @@ class _AnalysisPageState extends State<AnalysisPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                bmiAdvice!,
-                                style: const TextStyle(
-                                  color: ColorPalette.darkGreen,
-                                  fontSize: 14,
+                              MarkdownBody(
+                                data: bmiAdvice!,
+                                styleSheet: MarkdownStyleSheet(
+                                  p: const TextStyle(
+                                    fontSize: 14,
+                                    color: ColorPalette.darkGreen,
+                                  ),
                                 ),
                               ),
                             ],
