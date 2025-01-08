@@ -106,7 +106,7 @@ The application uses SQLite for local storage with the following main tables:
 - **UserNutrition**: Daily nutrition tracking data
 
 | **Entity-Relationship Diagram of the SQLite Database** |
----
+| --- |
 | ![er-diagram](images/er-diagram.png) |
 
 ## Features in Development
