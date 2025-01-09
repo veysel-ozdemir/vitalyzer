@@ -97,6 +97,12 @@ class AuthService {
       // Store user profile ID
       await prefs.setInt('userProfileId', userProfile.userId!);
 
+      // Get physical attributes
+      await prefs.setInt('userHeight', userProfile.height);
+      await prefs.setDouble('userWeight', userProfile.weight);
+      await prefs.setInt('userAge', userProfile.age);
+      await prefs.setString('userSex', userProfile.gender);
+
       // Initialize nutrition data
       await userNutritionController
           .initializeUserNutritionData(userProfile.userId!);
@@ -240,6 +246,281 @@ class AuthService {
       await _auth.signOut();
     } catch (e) {
       debugPrint('Error during sign out: $e');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getUserCredentialByUid(String uid) async {
+    try {
+      // Fetch user document from Firestore
+      DocumentSnapshot<Map<String, dynamic>> userDoc =
+          await _firestore.collection('users').doc(uid).get();
+
+      if (userDoc.exists) {
+        return userDoc.data();
+      } else {
+        debugPrint('No user found with UID: $uid');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error fetching user credential: $e');
+      rethrow;
+    }
+  }
+
+  /// Updates user fields in Firestore and local UserProfile
+  Future<void> updateUserFields({
+    required String uid,
+    String? fullName,
+    String? profilePhotoUrl,
+    Uint8List? imageBytes,
+    int? height,
+    double? weight,
+    int? age,
+    String? gender,
+  }) async {
+    try {
+      final Map<String, dynamic> updates = {};
+
+      if (fullName != null) updates['fullName'] = fullName;
+      if (profilePhotoUrl != null) updates['profilePhotoUrl'] = profilePhotoUrl;
+
+      if (updates.isNotEmpty) {
+        // Update Firestore
+        await _firestore.collection('users').doc(uid).update(updates);
+        debugPrint('User fields updated successfully in Firestore!');
+      }
+
+      if (fullName != null ||
+          profilePhotoUrl != null ||
+          imageBytes != null ||
+          height != null ||
+          weight != null ||
+          age != null ||
+          gender != null) {
+        // Update local UserProfile
+        final currentProfile = userProfileController.currentProfile.value;
+        if (currentProfile != null) {
+          final updatedProfile = UserProfile(
+            userId: currentProfile.userId,
+            firebaseUserUid: currentProfile.firebaseUserUid,
+            fullName: fullName ?? currentProfile.fullName,
+            email: currentProfile.email,
+            profilePhoto: imageBytes ?? currentProfile.profilePhoto,
+            height: height ?? currentProfile.height,
+            weight: weight ?? currentProfile.weight,
+            age: age ?? currentProfile.age,
+            gender: gender ?? currentProfile.gender,
+            createdAt: currentProfile.createdAt,
+            updatedAt: DateTime.now(),
+          );
+          await userProfileController.updateUserProfile(updatedProfile);
+        }
+        debugPrint('User fields updated successfullylocally');
+      }
+    } catch (e) {
+      debugPrint('Error updating user fields: $e');
+      rethrow;
+    }
+  }
+
+  /// Helper method to download profile photo
+  Future<Uint8List?> downloadProfilePhoto(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error downloading profile photo: $e');
+      return null;
+    }
+  }
+
+  /// Updates user email in Firebase Auth, Firestore, and local UserProfile
+  Future<void> updateUserEmail({
+    required String uid,
+    required String newEmail,
+    required String password,
+  }) async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user == null) throw Exception('No authenticated user found');
+
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      await user.verifyBeforeUpdateEmail(newEmail);
+
+      // Update local UserProfile email
+      final currentProfile = userProfileController.currentProfile.value;
+      if (currentProfile != null) {
+        final updatedProfile = UserProfile(
+          userId: currentProfile.userId,
+          firebaseUserUid: currentProfile.firebaseUserUid,
+          fullName: currentProfile.fullName,
+          email: newEmail, // Update the email
+          profilePhoto: currentProfile.profilePhoto,
+          height: currentProfile.height,
+          weight: currentProfile.weight,
+          age: currentProfile.age,
+          gender: currentProfile.gender,
+          createdAt: currentProfile.createdAt,
+          updatedAt: DateTime.now(),
+        );
+        await userProfileController.updateUserProfile(updatedProfile);
+      }
+      debugPrint('Successfully updated user email locally!');
+
+      Get.snackbar(
+        'Verification Required',
+        'Please check your new email address for verification',
+        backgroundColor: ColorPalette.beige,
+        colorText: ColorPalette.darkGreen,
+      );
+
+      // Update in Firestore and Auth will be done after verification
+      debugPrint('Pending for email verification by user...');
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'email-already-in-use':
+          message = 'This email is already registered';
+          break;
+        case 'invalid-email':
+          message = 'Invalid email format';
+          break;
+        case 'requires-recent-login':
+          message = 'Please log in again before updating email';
+          break;
+        default:
+          message = 'An error occurred: ${e.message}';
+      }
+      Get.snackbar(
+        'Error',
+        message,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      debugPrint('Error updating user email: $e');
+      rethrow;
+    } catch (e) {
+      debugPrint('Error updating user email: $e');
+      rethrow;
+    }
+  }
+
+  /// Updates user profile photo
+  Future<void> updateProfilePhoto({
+    required String uid,
+    required XFile image,
+  }) async {
+    try {
+      // Upload to Firebase Storage
+      final storageRef = _storage
+          .ref()
+          .child('profile_photos')
+          .child('${uid}_${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      await storageRef.putFile(File(image.path));
+      final String photoUrl = await storageRef.getDownloadURL();
+      final Uint8List imageBytes = await image.readAsBytes();
+
+      // Update Firestore document with new photo URL
+      await updateUserFields(
+        uid: uid,
+        profilePhotoUrl: photoUrl,
+        imageBytes: imageBytes,
+      );
+    } catch (e) {
+      debugPrint('Error updating profile photo: $e');
+      rethrow;
+    }
+  }
+
+  /// Send password reset email
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      Get.snackbar(
+        'Success',
+        'Password reset email has been sent to $email',
+        backgroundColor: ColorPalette.beige,
+        colorText: ColorPalette.darkGreen,
+      );
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = 'No user found with this email';
+          break;
+        case 'invalid-email':
+          message = 'Invalid email format';
+          break;
+        default:
+          message = 'An error occurred: ${e.message}';
+      }
+      Get.snackbar(
+        'Error',
+        message,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      rethrow;
+    }
+  }
+
+  /// Change password (when user knows current password)
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('No authenticated user found');
+
+      // Re-authenticate user before password change
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      await user.updatePassword(newPassword);
+
+      Get.snackbar(
+        'Success',
+        'Password has been updated successfully',
+        backgroundColor: ColorPalette.beige,
+        colorText: ColorPalette.darkGreen,
+      );
+
+      debugPrint('Successfully updated user password!');
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'weak-password':
+          message = 'The password provided is too weak';
+          break;
+        case 'requires-recent-login':
+          message = 'Please log in again before changing password';
+          break;
+        case 'wrong-password':
+          message = 'Current password is incorrect';
+          break;
+        default:
+          message = 'An error occurred: ${e.message}';
+      }
+      Get.snackbar(
+        'Error',
+        message,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       rethrow;
     }
   }

@@ -31,6 +31,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final TextEditingController _currentPasswordController =
+      TextEditingController();
   bool _obscurePassword = true;
 
   final ImagePicker _imagePicker = ImagePicker();
@@ -59,13 +61,12 @@ class _ProfilePageState extends State<ProfilePage> {
   String? currentUserFirebaseUid;
   UserProfile? currentUserProfile;
   Uint8List? userProfilePhoto;
+  XFile? profilePhoto;
 
   final UserProfileController _userProfileController = Get.find();
 
-  // todo: get the current values of following variables and show in text form fields
   String? userName;
   String? userEmail;
-  String? userPassword;
 
   @override
   void initState() {
@@ -112,6 +113,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
       setState(() {
         userProfilePhoto = currentUserProfile!.profilePhoto;
+        userName = currentUserProfile!.fullName;
+        userEmail = currentUserProfile!.email;
+
+        _nameController.text = userName!;
+        _emailController.text = userEmail!;
       });
     } else {
       debugPrint('Could not fetch current user profile from local database');
@@ -125,6 +131,7 @@ class _ProfilePageState extends State<ProfilePage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _currentPasswordController.dispose();
     super.dispose();
   }
 
@@ -185,6 +192,260 @@ class _ProfilePageState extends State<ProfilePage> {
           .map((e) => e.toString())
           .toList(),
     );
+  }
+
+  Future<void> _saveUserProfileChanges() async {
+    try {
+      // Update profile photo
+      if (profilePhoto != null) {
+        await _authService.updateProfilePhoto(
+          uid: currentUserFirebaseUid!,
+          image: profilePhoto!,
+        );
+      }
+
+      // Update user name
+      if (_nameController.text.trim().isEmpty) {
+        Get.snackbar(
+          'Caution:',
+          'Name field should be filled',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      } else {
+        await _authService.updateUserFields(
+          uid: currentUserFirebaseUid!,
+          fullName: _nameController.text.trim(),
+        );
+      }
+
+      // Update user email
+      if (_emailController.text.trim().isEmpty) {
+        Get.snackbar(
+          'Caution:',
+          'Email field cannot be empty',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      } else if (_emailController.text.trim() !=
+          _userProfileController.currentProfile.value!.email) {
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: ColorPalette.beige,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(
+                  width: 3,
+                  color: ColorPalette.lightGreen,
+                ),
+              ),
+              title: const Text(
+                'Password required to update email',
+                style: TextStyle(color: ColorPalette.darkGreen),
+              ),
+              content: Padding(
+                padding: const EdgeInsets.all(5),
+                child: TextFormField(
+                  controller: _currentPasswordController,
+                  style: const TextStyle(
+                    color: ColorPalette.darkGreen,
+                  ),
+                  cursorColor: ColorPalette.green,
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Current password',
+                    hintStyle: TextStyle(
+                      color: ColorPalette.green.withOpacity(0.75),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 10,
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: ColorPalette.green,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
+                      ),
+                    ),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: ColorPalette.green,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    _currentPasswordController.clear();
+                    Get.back();
+                  },
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: ColorPalette.darkGreen),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: const Text(
+                    'Ok',
+                    style: TextStyle(color: ColorPalette.darkGreen),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+
+        await _authService.updateUserEmail(
+          uid: currentUserFirebaseUid!,
+          newEmail: _emailController.text.trim(),
+          password: _currentPasswordController.text.trim(),
+        );
+
+        _currentPasswordController.clear();
+      }
+
+      // Update user password
+      if (_passwordController.text.trim().isNotEmpty) {
+        if (_passwordController.text.trim() !=
+            _confirmPasswordController.text.trim()) {
+          Get.snackbar(
+            'Caution:',
+            'Passwords do not match',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+          return;
+        } else {
+          await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                backgroundColor: ColorPalette.beige,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: const BorderSide(
+                    width: 3,
+                    color: ColorPalette.lightGreen,
+                  ),
+                ),
+                title: const Text(
+                  'Password required to update password',
+                  style: TextStyle(color: ColorPalette.darkGreen),
+                ),
+                content: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: TextFormField(
+                    controller: _currentPasswordController,
+                    style: const TextStyle(
+                      color: ColorPalette.darkGreen,
+                    ),
+                    cursorColor: ColorPalette.green,
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Current password',
+                      hintStyle: TextStyle(
+                        color: ColorPalette.green.withOpacity(0.75),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 0,
+                        horizontal: 10,
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: ColorPalette.green,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(15),
+                        ),
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: ColorPalette.green,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(15),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      _currentPasswordController.clear();
+                      Get.back();
+                    },
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: ColorPalette.darkGreen),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Get.back(),
+                    child: const Text(
+                      'Ok',
+                      style: TextStyle(color: ColorPalette.darkGreen),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+
+          await _authService.changePassword(
+            currentPassword: _currentPasswordController.text.trim(),
+            newPassword: _passwordController.text.trim(),
+          );
+
+          _currentPasswordController.clear();
+        }
+      }
+
+      // navigate to home page
+      await Get.offAll(() => const HomePage());
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        "Couldn't complete the update of user profile credentials!",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      debugPrint('Error: ${e.toString()}');
+    }
   }
 
   @override
@@ -588,45 +849,50 @@ class _ProfilePageState extends State<ProfilePage> {
       // Pick an image.
       final XFile? image =
           await _imagePicker.pickImage(source: ImageSource.gallery);
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) {
-            return AlertDialog(
-              backgroundColor: ColorPalette.beige,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(
-                  width: 3,
-                  color: ColorPalette.lightGreen,
-                ),
-              ),
-              title: const Text(
-                'Selected Image',
-                style: TextStyle(color: ColorPalette.darkGreen),
-              ),
-              content: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: image != null
-                    ? Image.file(
-                        File(image.path), // Convert XFile to File
-                        fit: BoxFit.cover,
-                      )
-                    : const Text('null'),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Get.back(),
-                  child: const Text(
-                    'Close',
-                    style: TextStyle(color: ColorPalette.darkGreen),
+
+      setState(() {
+        profilePhoto = image;
+      });
+
+      if (profilePhoto != null) {
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                backgroundColor: ColorPalette.beige,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: const BorderSide(
+                    width: 3,
+                    color: ColorPalette.lightGreen,
                   ),
                 ),
-              ],
-            );
-          },
-        );
+                title: const Text(
+                  'Selected Image',
+                  style: TextStyle(color: ColorPalette.darkGreen),
+                ),
+                content: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    File(profilePhoto!.path), // Convert XFile to File
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Get.back(),
+                    child: const Text(
+                      'Close',
+                      style: TextStyle(color: ColorPalette.darkGreen),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        }
       }
     } else {
       if (context.mounted) {
@@ -1351,12 +1617,14 @@ class _ProfilePageState extends State<ProfilePage> {
       kgWeight: selectedWeight!,
       cmHeight: selectedHeight!,
     );
+    debugPrint('BMI calculated...');
     // get new bmi advice
     await nutritionController.getBMIAdvice(
       bmi: bodyMassIndexLevel!,
       gender: selectedSex!,
       age: selectedAge!,
     );
+    debugPrint('BMI advice generated...');
     // get new daily limits
     await nutritionController.calculateNutritionLimits(
       age: selectedAge!,
@@ -1364,9 +1632,23 @@ class _ProfilePageState extends State<ProfilePage> {
       height: selectedHeight!,
       weight: selectedWeight!,
     );
+    debugPrint('Nutrition limits calculated...');
     // save physical information
     await _saveDataToSharedPrefs();
-    // navigate to home page
-    await Get.offAll(() => const HomePage());
+    debugPrint('Data saved to shared prefs:');
+    printKeyValueOfSharedPrefs(prefs);
+    // save user fields locally
+    await _authService.updateUserFields(
+      uid: currentUserFirebaseUid!,
+      height: selectedHeight!,
+      weight: selectedWeight!,
+      age: selectedAge!,
+      gender: selectedSex!,
+    );
+    debugPrint('Data saved locally');
+    // save profile information
+    debugPrint('Before user profile update');
+    await _saveUserProfileChanges();
+    debugPrint('After user profile update');
   }
 }
