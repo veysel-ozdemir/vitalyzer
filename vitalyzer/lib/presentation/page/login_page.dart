@@ -11,6 +11,7 @@ import 'package:vitalyzer/presentation/page/user_info_fill_page.dart';
 import 'package:vitalyzer/util/extension.dart';
 import 'package:vitalyzer/service/auth_service.dart';
 import 'package:vitalyzer/util/funtions.dart';
+import 'package:vitalyzer/presentation/page/forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -242,7 +243,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () async =>
+                  await Get.to(() => const ForgotPasswordPage()),
               child: Text(
                 'Forgot the password?',
                 style: TextStyle(
