@@ -1532,10 +1532,120 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             TextButton(
-              onPressed: () => Get.back(),
+              onPressed: () async {
+                Get.back(); // Close the confirmation dialog
+
+                // Show password confirmation dialog
+                await showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) {
+                    return AlertDialog(
+                      backgroundColor: ColorPalette.beige,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: const BorderSide(
+                          width: 3,
+                          color: ColorPalette.lightGreen,
+                        ),
+                      ),
+                      title: const Text(
+                        'Confirm Password',
+                        style: TextStyle(color: ColorPalette.darkGreen),
+                      ),
+                      content: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: TextFormField(
+                          controller: _currentPasswordController,
+                          style: const TextStyle(
+                            color: ColorPalette.darkGreen,
+                          ),
+                          cursorColor: ColorPalette.green,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            hintText: 'Enter your password',
+                            hintStyle: TextStyle(
+                              color: ColorPalette.green.withOpacity(0.75),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0,
+                              horizontal: 10,
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: ColorPalette.green,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(15),
+                              ),
+                            ),
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: ColorPalette.green,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(15),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            _currentPasswordController.clear();
+                            Get.back();
+                          },
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(color: ColorPalette.darkGreen),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            try {
+                              await _authService.deleteUserAccount(
+                                uid: currentUserFirebaseUid!,
+                                password:
+                                    _currentPasswordController.text.trim(),
+                              );
+                              _currentPasswordController.clear();
+
+                              // Clear shared preferences
+                              await prefs.clear();
+                              // Initialize essential shared preferences data
+                              await initSharedPrefData(prefs);
+                              await prefs.setBool(
+                                  'userHasFilledInfoForm', false);
+                              await prefs.setBool('hasActiveSession', false);
+
+                              debugPrint(
+                                  '\nShared Prefs after account deletion:');
+                              printKeyValueOfSharedPrefs(prefs);
+
+                              // Navigate to landing page
+                              await Get.offAll(() => const LandingPage());
+                            } catch (e) {
+                              debugPrint('Error during account deletion: $e');
+                            }
+                          },
+                          child: const Text(
+                            'Delete Account',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
               child: const Text(
                 'Delete',
-                style: TextStyle(color: ColorPalette.darkGreen),
+                style: TextStyle(color: Colors.red),
               ),
             ),
           ],
@@ -1595,8 +1705,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 debugPrint('\nShared Prefs after sign out:');
                 printKeyValueOfSharedPrefs(prefs);
 
-                prefs.setBool('userHasFilledInfoForm', false);
-                prefs.setBool('hasActiveSession', false);
+                await prefs.setBool('userHasFilledInfoForm', false);
+                await prefs.setBool('hasActiveSession', false);
 
                 await Get.offAll(() => const LandingPage());
               },

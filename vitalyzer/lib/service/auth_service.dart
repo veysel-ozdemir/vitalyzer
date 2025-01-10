@@ -540,4 +540,93 @@ class AuthService {
       rethrow;
     }
   }
+
+  /// Delete user account and all associated data
+  Future<void> deleteUserAccount({
+    required String uid,
+    required String password,
+  }) async {
+    try {
+      // Get current user and re-authenticate
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('No authenticated user found');
+
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      // Get user document to check for profile photo
+      final userDoc = await _firestore.collection('users').doc(uid).get();
+      final userData = userDoc.data();
+
+      // Delete profile photo from Storage if it exists
+      if (userData != null && userData['profilePhotoUrl'] != null) {
+        try {
+          final photoRef = _storage.refFromURL(userData['profilePhotoUrl']);
+          await photoRef.delete();
+          debugPrint('Profile photo deleted from Storage');
+        } catch (e) {
+          debugPrint('Error deleting profile photo: $e');
+          // Continue with deletion even if photo deletion fails
+        }
+      }
+
+      // Delete user document from Firestore
+      await _firestore.collection('users').doc(uid).delete();
+      debugPrint('User document deleted from Firestore');
+
+      // Delete local data
+      final currentProfile = userProfileController.currentProfile.value;
+      if (currentProfile?.userId != null) {
+        // Delete user nutrition data
+        await userNutritionController
+            .loadUserNutritions(currentProfile!.userId!);
+        // Create a new list with the nutritions to delete
+        final nutritionsToDelete =
+            List<UserNutrition>.from(userNutritionController.userNutritions);
+
+        // Delete each nutrition entry
+        for (var nutrition in nutritionsToDelete) {
+          if (nutrition.nutritionId != null) {
+            await userNutritionController
+                .deleteUserNutrition(nutrition.nutritionId!);
+          }
+        }
+        debugPrint('User nutrition data deleted from local database');
+
+        // Delete user profile
+        await userProfileController.deleteUserProfile(currentProfile.userId!);
+        debugPrint('User profile deleted from local database');
+      }
+
+      // Finally, delete the Firebase Auth account
+      await user.delete();
+      debugPrint('User account deleted from Firebase Auth');
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'requires-recent-login':
+          message = 'Please log in again before deleting your account';
+          break;
+        case 'wrong-password':
+          message = 'Current password is incorrect';
+          break;
+        default:
+          message = 'An error occurred: ${e.message}';
+      }
+      Get.snackbar(
+        'Error',
+        message,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      debugPrint('FirebaseAuthException occurred: $message');
+      rethrow;
+    } catch (e) {
+      debugPrint('Error deleting user account: $e');
+      rethrow;
+    }
+  }
 }
