@@ -420,7 +420,23 @@ class AuthService {
     required XFile image,
   }) async {
     try {
-      // Upload to Firebase Storage
+      // Get current user data to check for existing photo URL
+      final userDoc = await _firestore.collection('users').doc(uid).get();
+      final userData = userDoc.data();
+
+      // Delete old photo if it exists
+      if (userData != null && userData['profilePhotoUrl'] != null) {
+        try {
+          final oldPhotoRef = _storage.refFromURL(userData['profilePhotoUrl']);
+          await oldPhotoRef.delete();
+          debugPrint('Old profile photo deleted successfully');
+        } catch (e) {
+          debugPrint('Error deleting old profile photo: $e');
+          // Continue with upload even if delete fails
+        }
+      }
+
+      // Upload new photo to Firebase Storage
       final storageRef = _storage
           .ref()
           .child('profile_photos')
