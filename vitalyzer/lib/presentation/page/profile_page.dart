@@ -19,7 +19,12 @@ import 'package:vitalyzer/util/extension.dart';
 import 'package:vitalyzer/util/funtions.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final String nameInitials;
+
+  const ProfilePage({
+    super.key,
+    required this.nameInitials,
+  });
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -507,13 +512,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               )
                             : Center(
-                                child: IconButton(
+                                child: TextButton(
                                   onPressed: null,
-                                  enableFeedback: false,
-                                  icon: Icon(
-                                    Icons.person,
-                                    size: Get.width * 0.2,
-                                    color: ColorPalette.green,
+                                  child: Text(
+                                    widget.nameInitials,
+                                    style: const TextStyle(
+                                      color: ColorPalette.green,
+                                      fontSize: 35,
+                                    ),
                                   ),
                                 ),
                               ),

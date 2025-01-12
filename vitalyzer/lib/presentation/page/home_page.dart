@@ -54,6 +54,7 @@ class _HomePageState extends State<HomePage> {
   List<bool> waterBottleItemStates = []; // Pressed states of items
   UserProfile? currentUserProfile;
   Uint8List? userProfilePhoto;
+  String nameInitials = '';
   late SharedPreferences prefs;
   final NutritionController _nutritionController = Get.find();
   final UserProfileController _userProfileController = Get.find();
@@ -139,6 +140,17 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         userProfilePhoto = currentUserProfile!.profilePhoto;
+        var splitted = currentUserProfile!.fullName.split(' ');
+        int count;
+        if (splitted.length == 1) {
+          count = 1;
+        } else {
+          count = 2;
+        }
+        for (int i = 0; i < count; i++) {
+          String split = splitted[i];
+          nameInitials += split[0].toUpperCase();
+        }
       });
     } else {
       debugPrint('Could not fetch current user profile from local database');
@@ -284,8 +296,8 @@ class _HomePageState extends State<HomePage> {
                                   ],
                                 ),
                                 InkWell(
-                                  onTap: () async =>
-                                      await Get.to(() => const ProfilePage()),
+                                  onTap: () async => await Get.to(() =>
+                                      ProfilePage(nameInitials: nameInitials)),
                                   child: Container(
                                     alignment: Alignment.center,
                                     child: Container(
@@ -308,13 +320,14 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             )
                                           : Center(
-                                              child: IconButton(
+                                              child: TextButton(
                                                 onPressed: null,
-                                                enableFeedback: false,
-                                                icon: Icon(
-                                                  Icons.person,
-                                                  size: Get.width * 0.2,
-                                                  color: ColorPalette.green,
+                                                child: Text(
+                                                  nameInitials,
+                                                  style: const TextStyle(
+                                                    color: ColorPalette.green,
+                                                    fontSize: 35,
+                                                  ),
                                                 ),
                                               ),
                                             ),
