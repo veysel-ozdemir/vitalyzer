@@ -52,12 +52,17 @@ class _HomePageState extends State<HomePage> {
   int? proteinCaloriePerGram;
   int? fatCaloriePerGram;
   List<bool> waterBottleItemStates = []; // Pressed states of items
+  String? lastWaterDrinkingTime;
+  int lastWaterDrinkingDay = -1;
+  int lastWaterDrinkingHour = -1;
+  int lastWaterDrinkingMin = -1;
   UserProfile? currentUserProfile;
   Uint8List? userProfilePhoto;
   String nameInitials = '';
   late SharedPreferences prefs;
   final NutritionController _nutritionController = Get.find();
   final UserProfileController _userProfileController = Get.find();
+  final _scrollController = ScrollController();
 
   String greeting = '';
   late Timer timer;
@@ -72,6 +77,7 @@ class _HomePageState extends State<HomePage> {
     _updateGreeting();
     timer = Timer.periodic(const Duration(minutes: 1), (timer) {
       _updateGreeting();
+      _updateWaterReminder();
     });
     _startDayChangeCheck();
   }
@@ -86,6 +92,8 @@ class _HomePageState extends State<HomePage> {
       waterBottleCapacity = prefs.getDouble('waterBottleCapacity');
 
       waterBottleItemCount = (dailyWaterLimit! / waterBottleCapacity!).toInt();
+
+      lastWaterDrinkingTime = prefs.getString('lastWaterDrinkingTime');
 
       carbsCalorieLimit = prefs.getDouble('carbsCalorieLimit');
       proteinCalorieLimit = prefs.getDouble('proteinCalorieLimit');
@@ -120,6 +128,9 @@ class _HomePageState extends State<HomePage> {
       proteinCaloriePerGram = prefs.getInt('proteinCaloriePerGram');
       fatCaloriePerGram = prefs.getInt('fatCaloriePerGram');
     });
+
+    // update water reminder
+    _updateWaterReminder();
 
     // load current user profile
     await _loadUserProfile();
@@ -159,6 +170,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _saveWaterData() async {
+    setState(() {
+      lastWaterDrinkingTime =
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    });
+    await prefs.setString('lastWaterDrinkingTime', lastWaterDrinkingTime!);
     await prefs.setInt('drankWaterBottle', drankWaterBottle);
     await prefs.setStringList('waterBottleItemStates',
         waterBottleItemStates.map((e) => e.toString()).toList());
@@ -194,6 +210,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _updateWaterLimitData() async {
+    setState(() {
+      lastWaterDrinkingTime =
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    });
+    await prefs.setString('lastWaterDrinkingTime', lastWaterDrinkingTime!);
     await prefs.setDouble('dailyWaterLimit', dailyWaterLimit!);
     await prefs.setInt('drankWaterBottle', drankWaterBottle);
     await prefs.setStringList('waterBottleItemStates',
@@ -220,6 +241,25 @@ class _HomePageState extends State<HomePage> {
     if (newGreeting != greeting) {
       setState(() {
         greeting = newGreeting;
+      });
+    }
+  }
+
+  void _updateWaterReminder() {
+    if (lastWaterDrinkingTime != null) {
+      // Last water drinking time
+      DateTime last = DateTime.parse(lastWaterDrinkingTime!);
+      // Get the current date and time
+      DateTime now = DateTime.now();
+
+      // Calculate the difference
+      Duration difference = now.difference(last);
+
+      // Extract days, hours, and minutes
+      setState(() {
+        lastWaterDrinkingDay = difference.inDays;
+        lastWaterDrinkingHour = difference.inHours % 24;
+        lastWaterDrinkingMin = difference.inMinutes % 60;
       });
     }
   }
@@ -515,6 +555,37 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                             Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 10, bottom: 10),
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color:
+                                      ColorPalette.lightGreen.withOpacity(0.5),
+                                  border: Border.all(
+                                      color: ColorPalette.lightGreen, width: 3),
+                                ),
+                                width: Get.width,
+                                child: Scrollbar(
+                                  controller: _scrollController,
+                                  scrollbarOrientation:
+                                      ScrollbarOrientation.right,
+                                  trackVisibility: true,
+                                  interactive: true,
+                                  thickness: 6,
+                                  radius: const Radius.circular(30),
+                                  child: SingleChildScrollView(
+                                    controller: _scrollController,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [_waterTextWidget()],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
                               padding: const EdgeInsets.only(top: 10),
                               child: SizedBox(
                                 height: deviceSize.height * 0.15,
@@ -594,6 +665,43 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+    );
+  }
+
+  Widget _waterTextWidget() {
+    if (lastWaterDrinkingTime != null) {
+      if (lastWaterDrinkingMin <= 0 &&
+          lastWaterDrinkingHour <= 0 &&
+          lastWaterDrinkingDay <= 0) {
+        // Pass
+      } else if (lastWaterDrinkingDay == 0 && lastWaterDrinkingHour == 0) {
+        // Show only minutes
+        return Text(
+          "You haven't been hydrated since $lastWaterDrinkingMin minutes. Don't forget your daily intake!",
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: ColorPalette.green),
+        );
+      } else if (lastWaterDrinkingDay == 0) {
+        // Show hours and minutes
+        return Text(
+          "You haven't been hydrated since $lastWaterDrinkingHour hours and $lastWaterDrinkingMin minutes. Don't forget your daily intake!",
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: ColorPalette.green),
+        );
+      } else {
+        return Text(
+          "You haven't been hydrated since $lastWaterDrinkingDay days, $lastWaterDrinkingHour hours, and $lastWaterDrinkingMin minutes. Don't forget your daily intake!",
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: ColorPalette.green),
+        );
+      }
+    }
+    return const Text(
+      "A well-hydrated body is the key to clear thinking and boundless energy — don't forget your daily water intake!",
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: ColorPalette.green,
+      ),
     );
   }
 

@@ -151,7 +151,6 @@ class _ProfilePageState extends State<ProfilePage> {
       case 'Log Out':
         _logOutDialog();
       case 'Delete Account':
-        // todo: delete account
         _deleteAccountDialog();
     }
   }

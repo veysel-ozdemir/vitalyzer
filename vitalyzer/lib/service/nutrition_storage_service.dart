@@ -87,5 +87,6 @@ class NutritionStorageService {
     await prefs.setDouble('gainedProteinGram', 0.0);
     await prefs.setDouble('gainedFatGram', 0.0);
     await prefs.setInt('drankWaterBottle', 0);
+    await prefs.remove('waterBottleItemStates');
   }
 }
