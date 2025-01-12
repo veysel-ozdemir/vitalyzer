@@ -5,12 +5,15 @@ import 'package:get/get.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/scan_controller.dart';
 import 'package:vitalyzer/presentation/camera/scan_result_page.dart';
+import 'package:vitalyzer/presentation/camera/water_bottle_scan_result_page.dart';
+import 'package:vitalyzer/util/scan_option.dart';
 
 class ConfirmImagePage extends StatelessWidget {
   final XFile image;
+  final ScanOption scanOption;
   final ScanController controller = Get.find();
 
-  ConfirmImagePage({super.key, required this.image});
+  ConfirmImagePage({super.key, required this.image, required this.scanOption});
 
   @override
   Widget build(BuildContext context) {
@@ -58,30 +61,56 @@ class ConfirmImagePage extends StatelessWidget {
                         )),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    await controller.analyzeImage(image);
-                    Get.to(() => ScanResultPage());
-                  },
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: Size.fromWidth(Get.width * 0.3),
-                    backgroundColor: ColorPalette.green,
-                    shape: const RoundedRectangleBorder(
-                      side: BorderSide(color: ColorPalette.green, width: 2),
-                      borderRadius: BorderRadius.all(Radius.circular(30)),
-                    ),
-                  ),
-                  child: const Text('Analyze',
-                      style: TextStyle(
-                        color: ColorPalette.beige,
-                        fontSize: 16,
-                      )),
-                ),
+                _submitButton(),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _submitButton() {
+    if (scanOption == ScanOption.mealScan) {
+      return ElevatedButton(
+        onPressed: () async {
+          await controller.analyzeImage(image);
+          await Get.to(() => ScanResultPage());
+        },
+        style: ElevatedButton.styleFrom(
+          fixedSize: Size.fromWidth(Get.width * 0.3),
+          backgroundColor: ColorPalette.green,
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(color: ColorPalette.green, width: 2),
+            borderRadius: BorderRadius.all(Radius.circular(30)),
+          ),
+        ),
+        child: const Text('Analyze',
+            style: TextStyle(
+              color: ColorPalette.beige,
+              fontSize: 16,
+            )),
+      );
+    } else {
+      return ElevatedButton(
+        onPressed: () async {
+          await controller.scanWaterBottle(image);
+          await Get.to(() => WaterBottleScanResultPage());
+        },
+        style: ElevatedButton.styleFrom(
+          fixedSize: Size.fromWidth(Get.width * 0.3),
+          backgroundColor: ColorPalette.green,
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(color: ColorPalette.green, width: 2),
+            borderRadius: BorderRadius.all(Radius.circular(30)),
+          ),
+        ),
+        child: const Text('Scan Bottle',
+            style: TextStyle(
+              color: ColorPalette.beige,
+              fontSize: 16,
+            )),
+      );
+    }
   }
 }

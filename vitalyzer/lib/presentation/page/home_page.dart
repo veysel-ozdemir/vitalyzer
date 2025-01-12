@@ -19,6 +19,7 @@ import 'package:vitalyzer/presentation/widget/nutrient_pie_chart.dart';
 import 'package:vitalyzer/util/extension.dart';
 import 'package:intl/intl.dart';
 import 'package:vitalyzer/service/nutrition_storage_service.dart';
+import 'package:vitalyzer/util/scan_option.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -516,40 +517,59 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ],
                                 ),
-                                Column(
+                                Row(
                                   children: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          _openWaterCounterSettings(
-                                        context: context,
-                                        onWaterLimitUpdate: (waterLimit) async {
-                                          setState(() {
-                                            drankWaterBottle = 0;
-                                            dailyWaterLimit = waterLimit;
-                                            waterBottleItemCount =
-                                                (dailyWaterLimit! /
-                                                        waterBottleCapacity!)
-                                                    .toInt();
-                                            waterBottleItemStates =
-                                                List.generate(
-                                              waterBottleItemCount,
-                                              (_) => false,
-                                            );
-                                          });
-
-                                          await _updateWaterLimitData();
-                                        },
-                                      ),
-                                      child: Text(
-                                        '...',
-                                        style: TextStyle(
-                                          color: ColorPalette.darkGreen
-                                              .withOpacity(0.75),
-                                          fontSize: 20,
+                                    IconButton(
+                                      onPressed: () async => await Get.to(
+                                        () => const CameraScreen(
+                                          scanOption:
+                                              ScanOption.waterBottleScan,
                                         ),
                                       ),
+                                      icon: const Icon(
+                                        Icons.camera,
+                                        color: ColorPalette.green,
+                                        size: 30,
+                                      ),
+                                      tooltip: 'Scan Water Bottle',
                                     ),
-                                    const SizedBox(height: 20)
+                                    Column(
+                                      children: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              _openWaterCounterSettings(
+                                            context: context,
+                                            onWaterLimitUpdate:
+                                                (waterLimit) async {
+                                              setState(() {
+                                                drankWaterBottle = 0;
+                                                dailyWaterLimit = waterLimit;
+                                                waterBottleItemCount =
+                                                    (dailyWaterLimit! /
+                                                            waterBottleCapacity!)
+                                                        .toInt();
+                                                waterBottleItemStates =
+                                                    List.generate(
+                                                  waterBottleItemCount,
+                                                  (_) => false,
+                                                );
+                                              });
+
+                                              await _updateWaterLimitData();
+                                            },
+                                          ),
+                                          child: Text(
+                                            '...',
+                                            style: TextStyle(
+                                              color: ColorPalette.darkGreen
+                                                  .withOpacity(0.75),
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10)
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ],
@@ -634,8 +654,11 @@ class _HomePageState extends State<HomePage> {
                           ),
                           const Spacer(flex: 3),
                           InkWell(
-                            onTap: () async =>
-                                await Get.to(() => const CameraScreen()),
+                            onTap: () async => await Get.to(
+                              () => const CameraScreen(
+                                scanOption: ScanOption.mealScan,
+                              ),
+                            ),
                             child: Container(
                               alignment: Alignment.center,
                               height: deviceSize.height * 0.075,

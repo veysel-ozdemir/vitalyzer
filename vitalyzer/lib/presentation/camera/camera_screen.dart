@@ -5,9 +5,12 @@ import 'package:vitalyzer/controller/permission_controller.dart';
 import 'package:vitalyzer/controller/scan_controller.dart';
 import 'package:vitalyzer/presentation/camera/camera_viewer.dart';
 import 'package:vitalyzer/presentation/camera/capture_button.dart';
+import 'package:vitalyzer/util/scan_option.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key});
+  final ScanOption scanOption;
+
+  const CameraScreen({super.key, required this.scanOption});
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -47,12 +50,12 @@ class _CameraScreenState extends State<CameraScreen> {
           );
         }
         return (scanController.isInitialized == true)
-            ? const PopScope(
+            ? PopScope(
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    CameraViewer(),
-                    CaptureButton(),
+                    const CameraViewer(),
+                    CaptureButton(scanOption: widget.scanOption),
                   ],
                 ),
               )

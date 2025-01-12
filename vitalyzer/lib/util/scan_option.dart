@@ -1,0 +1,1 @@
+enum ScanOption { mealScan, waterBottleScan }

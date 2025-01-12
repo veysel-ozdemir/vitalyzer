@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vitalyzer/controller/scan_controller.dart';
 import 'package:vitalyzer/presentation/camera/confirm_image_page.dart';
+import 'package:vitalyzer/util/scan_option.dart';
 
 class CaptureButton extends GetView<ScanController> {
-  const CaptureButton({super.key});
+  final ScanOption scanOption;
+
+  const CaptureButton({super.key, required this.scanOption});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +17,9 @@ class CaptureButton extends GetView<ScanController> {
         onTap: () async {
           final image = await controller.takePicture();
           if (image != null) {
-            Get.to(() => ConfirmImagePage(image: image));
+            Get.to(
+              () => ConfirmImagePage(image: image, scanOption: scanOption),
+            );
           }
         },
         child: Container(

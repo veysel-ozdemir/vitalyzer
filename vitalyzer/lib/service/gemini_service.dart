@@ -34,6 +34,22 @@ class GeminiService {
     }
   }
 
+  Future<String> scanWaterBottle(Uint8List imageBytes) async {
+    try {
+      const prompt =
+          'Analyze this water bottle image and, if visible, provide the amount of water drunk in L. If the capacity is not clearly visible, provide the estimated amount in L, which should be rounded to nearest 0.5L.';
+      final content = [
+        Content.text(prompt),
+        Content.data('image/jpeg', imageBytes),
+      ];
+
+      final response = await _model.generateContent(content);
+      return response.text ?? 'No response generated';
+    } catch (e) {
+      return 'Error analyzing image: $e';
+    }
+  }
+
   Future<String> calculateNutritionLimits({
     required int height,
     required double weight,

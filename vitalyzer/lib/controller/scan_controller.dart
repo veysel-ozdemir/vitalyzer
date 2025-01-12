@@ -98,6 +98,24 @@ class ScanController extends GetxController {
     }
   }
 
+  Future<void> scanWaterBottle(XFile image) async {
+    try {
+      isAnalyzing.value = true;
+
+      // Read image bytes
+      final imageBytes = await image.readAsBytes();
+
+      // Analyze with Gemini
+      final result = await _geminiService.scanWaterBottle(imageBytes);
+
+      analysisResult.value = result;
+    } catch (e) {
+      analysisResult.value = 'Error analyzing image: $e';
+    } finally {
+      isAnalyzing.value = false;
+    }
+  }
+
   Future<XFile?> takePicture() async {
     if (!_cameraController.value.isInitialized) {
       return null;
