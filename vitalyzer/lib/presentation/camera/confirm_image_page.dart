@@ -78,7 +78,7 @@ class ConfirmImagePage extends StatelessWidget {
           await Get.to(() => ScanResultPage());
         },
         style: ElevatedButton.styleFrom(
-          fixedSize: Size.fromWidth(Get.width * 0.3),
+          fixedSize: Size.fromWidth(Get.width * 0.35),
           backgroundColor: ColorPalette.green,
           shape: const RoundedRectangleBorder(
             side: BorderSide(color: ColorPalette.green, width: 2),
@@ -98,7 +98,7 @@ class ConfirmImagePage extends StatelessWidget {
           await Get.to(() => WaterBottleScanResultPage());
         },
         style: ElevatedButton.styleFrom(
-          fixedSize: Size.fromWidth(Get.width * 0.3),
+          fixedSize: Size.fromWidth(Get.width * 0.35),
           backgroundColor: ColorPalette.green,
           shape: const RoundedRectangleBorder(
             side: BorderSide(color: ColorPalette.green, width: 2),
