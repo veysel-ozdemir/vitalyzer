@@ -67,7 +67,8 @@ class _HomePageState extends State<HomePage> {
   final _scrollController = ScrollController();
 
   String greeting = '';
-  late Timer timer;
+  late Timer _waterReminderTimer;
+  late Timer _greetingCheckTimer;
   Timer? _dayCheckTimer;
   String? currentDay;
   final NutritionStorageService _nutritionStorage = NutritionStorageService();
@@ -77,8 +78,10 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _loadSharedPrefsAndUserProfileData();
     _updateGreeting();
-    timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+    _greetingCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
       _updateGreeting();
+    });
+    _waterReminderTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _updateWaterReminder();
     });
     _startDayChangeCheck();
@@ -186,7 +189,7 @@ class _HomePageState extends State<HomePage> {
         waterBottleItemStates.map((e) => e.toString()).toList());
   }
 
-  void _updateWaterBottleCount(int index, bool isPressed) {
+  void _updateWaterBottleCount(int index, bool isPressed) async {
     setState(() {
       if (isPressed) {
         drankWaterBottle++;
@@ -194,8 +197,8 @@ class _HomePageState extends State<HomePage> {
         drankWaterBottle--;
       }
       waterBottleItemStates[index] = isPressed; // Update state for this item
-      _saveWaterData(); // Save updated value
     });
+    await _saveWaterData(); // Save updated value
   }
 
   Future<void> _updateCalorieLimitData() async {
@@ -290,7 +293,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    timer.cancel();
+    _waterReminderTimer.cancel();
+    _greetingCheckTimer.cancel();
     _dayCheckTimer?.cancel();
     super.dispose();
   }
