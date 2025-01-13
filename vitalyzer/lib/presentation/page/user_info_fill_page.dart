@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/nutrition_controller.dart';
@@ -78,6 +79,9 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     await prefs.setDouble(
         'proteinGramLimit', _nutritionController.proteinLimit.value);
     await prefs.setDouble('fatGramLimit', _nutritionController.fatLimit.value);
+
+    await prefs.setString(
+        'currentDay', DateFormat('yyyy-MM-dd').format(DateTime.now()));
 
     await prefs.setBool('userHasFilledInfoForm', true);
   }

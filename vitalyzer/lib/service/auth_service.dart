@@ -109,7 +109,8 @@ class AuthService {
     } else {
       debugPrint('User profile not found');
 
-      if (prefs.get('userHasFilledInfoForm') == false) {
+      bool? filledForm = prefs.getBool('userHasFilledInfoForm');
+      if (filledForm == null || filledForm == false) {
         Get.snackbar(
           'Note:',
           'You have to provide your physical attributes in order to login in this device.',
@@ -149,66 +150,64 @@ class AuthService {
           // Convert the image data into bytes
           uint8ListImage = response.bodyBytes;
         }
+      }
+      UserProfile userProfile = UserProfile(
+          firebaseUserUid: userCredential.user!.uid,
+          fullName: fullName!,
+          email: userCredential.user!.email!,
+          profilePhoto: uint8ListImage,
+          height: prefs.getInt('userHeight') ?? 170,
+          weight: prefs.getDouble('userWeight') ?? 70.0,
+          age: prefs.getInt('userAge') ?? 35,
+          gender: prefs.getString('userSex') ?? 'Male',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now());
 
-        UserProfile userProfile = UserProfile(
-            firebaseUserUid: userCredential.user!.uid,
-            fullName: fullName!,
-            email: userCredential.user!.email!,
-            profilePhoto: uint8ListImage,
-            height: prefs.getInt('userHeight') ?? 170,
-            weight: prefs.getDouble('userWeight') ?? 70.0,
-            age: prefs.getInt('userAge') ?? 35,
-            gender: prefs.getString('userSex') ?? 'Male',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now());
+      // Create user profile locally
+      await userProfileController.createUserProfile(userProfile);
+      debugPrint(
+          'Created profile with Firebase UID: ${userProfile.firebaseUserUid}');
 
-        // Create user profile locally
-        await userProfileController.createUserProfile(userProfile);
-        debugPrint(
-            'Created profile with Firebase UID: ${userProfile.firebaseUserUid}');
+      // Load the current profile by Firebase UID
+      await userProfileController.loadUserProfile(userCredential.user!.uid);
+      debugPrint(
+          'Loaded profile: ${userProfileController.currentProfile.value?.firebaseUserUid}');
 
-        // Load the current profile by Firebase UID
-        await userProfileController.loadUserProfile(userCredential.user!.uid);
-        debugPrint(
-            'Loaded profile: ${userProfileController.currentProfile.value?.firebaseUserUid}');
+      // Get the current user profile
+      UserProfile? currentProfile = userProfileController.currentProfile.value;
 
-        // Get the current user profile
-        UserProfile? currentProfile =
-            userProfileController.currentProfile.value;
+      // If successfully created local user profile
+      if (currentProfile != null) {
+        debugPrint('Successfully created local user profile!');
 
-        // If successfully created local user profile
-        if (currentProfile != null) {
-          debugPrint('Successfully created local user profile!');
+        // Store the user profile id for current session
+        await prefs.setInt('userProfileId', currentProfile.userId!);
 
-          // Store the user profile id for current session
-          await prefs.setInt('userProfileId', currentProfile.userId!);
+        UserNutrition userNutrition = UserNutrition(
+            userId: currentProfile.userId!,
+            date:
+                DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now())),
+            gainedCarbsCalorie: 0.0,
+            gainedProteinCalorie: 0.0,
+            gainedFatCalorie: 0.0,
+            gainedCarbsGram: 0.0,
+            gainedProteinGram: 0.0,
+            gainedFatGram: 0.0,
+            consumedWater: 0.0,
+            waterLimit: prefs.getDouble('dailyWaterLimit')!,
+            carbsGramLimit: prefs.getDouble('carbsGramLimit')!,
+            proteinGramLimit: prefs.getDouble('proteinGramLimit')!,
+            fatGramLimit: prefs.getDouble('fatGramLimit')!,
+            carbsCalorieLimit: prefs.getDouble('carbsCalorieLimit')!,
+            proteinCalorieLimit: prefs.getDouble('proteinCalorieLimit')!,
+            fatCalorieLimit: prefs.getDouble('fatCalorieLimit')!,
+            bmiLevel: prefs.getDouble('bodyMassIndexLevel')!,
+            bmiAdvice: prefs.getString('bmiAdvice'));
 
-          UserNutrition userNutrition = UserNutrition(
-              userId: currentProfile.userId!,
-              date: DateTime.parse(
-                  DateFormat('yyyy-MM-dd').format(DateTime.now())),
-              gainedCarbsCalorie: 0.0,
-              gainedProteinCalorie: 0.0,
-              gainedFatCalorie: 0.0,
-              gainedCarbsGram: 0.0,
-              gainedProteinGram: 0.0,
-              gainedFatGram: 0.0,
-              consumedWater: 0.0,
-              waterLimit: prefs.getDouble('dailyWaterLimit')!,
-              carbsGramLimit: prefs.getDouble('carbsGramLimit')!,
-              proteinGramLimit: prefs.getDouble('proteinGramLimit')!,
-              fatGramLimit: prefs.getDouble('fatGramLimit')!,
-              carbsCalorieLimit: prefs.getDouble('carbsCalorieLimit')!,
-              proteinCalorieLimit: prefs.getDouble('proteinCalorieLimit')!,
-              fatCalorieLimit: prefs.getDouble('fatCalorieLimit')!,
-              bmiLevel: prefs.getDouble('bodyMassIndexLevel')!,
-              bmiAdvice: prefs.getString('bmiAdvice'));
+        // Create user nutrition locally
+        userNutritionController.createUserNutrition(userNutrition);
 
-          // Create user nutrition locally
-          userNutritionController.createUserNutrition(userNutrition);
-
-          debugPrint('Successfully created local user nutrition!');
-        }
+        debugPrint('Successfully created local user nutrition!');
       }
     }
   }

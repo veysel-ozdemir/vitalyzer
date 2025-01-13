@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/user_nutrition_controller.dart';
@@ -76,6 +77,9 @@ class _LoginPageState extends State<LoginPage> {
 
       // Initialize user data after successful login
       await _authService.initializeUserData(userCredential);
+
+      await prefs.setString(
+          'currentDay', DateFormat('yyyy-MM-dd').format(DateTime.now()));
 
       await prefs.setBool('hasActiveSession', true);
 

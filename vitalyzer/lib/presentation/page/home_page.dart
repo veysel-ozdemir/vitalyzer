@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
   String greeting = '';
   late Timer timer;
   Timer? _dayCheckTimer;
-  String _currentDay = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  String? currentDay;
   final NutritionStorageService _nutritionStorage = NutritionStorageService();
 
   @override
@@ -128,6 +128,8 @@ class _HomePageState extends State<HomePage> {
       carbsCaloriePerGram = prefs.getInt('carbsCaloriePerGram');
       proteinCaloriePerGram = prefs.getInt('proteinCaloriePerGram');
       fatCaloriePerGram = prefs.getInt('fatCaloriePerGram');
+
+      currentDay = prefs.getString('currentDay');
     });
 
     // update water reminder
@@ -269,10 +271,13 @@ class _HomePageState extends State<HomePage> {
     // Check every minute
     _dayCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
       final newDay = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      if (newDay != _currentDay) {
+      if (newDay != currentDay) {
         // Day has changed
-        _nutritionStorage.storeCurrentDayNutrition(_currentDay);
-        _currentDay = newDay;
+        _nutritionStorage.storeCurrentDayNutrition(currentDay!);
+        setState(() async {
+          currentDay = newDay;
+          await prefs.setString('currentDay', currentDay!);
+        });
       }
     });
   }
