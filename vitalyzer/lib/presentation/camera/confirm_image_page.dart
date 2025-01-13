@@ -95,7 +95,7 @@ class ConfirmImagePage extends StatelessWidget {
       return ElevatedButton(
         onPressed: () async {
           await controller.scanWaterBottle(image);
-          await Get.to(() => WaterBottleScanResultPage());
+          await Get.to(() => const WaterBottleScanResultPage());
         },
         style: ElevatedButton.styleFrom(
           fixedSize: Size.fromWidth(Get.width * 0.35),

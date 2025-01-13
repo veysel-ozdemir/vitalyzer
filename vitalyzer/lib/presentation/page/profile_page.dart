@@ -181,6 +181,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     await prefs.setInt('drankWaterBottle', 0);
 
+    await prefs.setBool('exceededWaterLimit', false);
+
+    await prefs.remove('lastWaterDrinkingTime');
+
     await prefs.setDouble('gainedCarbsCalorie', 0.0);
     await prefs.setDouble('gainedProteinCalorie', 0.0);
     await prefs.setDouble('gainedFatCalorie', 0.0);

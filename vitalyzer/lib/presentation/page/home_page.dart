@@ -34,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   String? currentUserFirebaseUid;
   double? waterBottleCapacity;
   double? dailyWaterLimit;
+  bool? exceededWaterLimit;
   int drankWaterBottle = 0;
   double dailyCalorieLimit = 0;
   double gainedCalories = 0;
@@ -88,6 +89,8 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       currentUserProfileId = prefs.getInt('userProfileId');
       currentUserFirebaseUid = prefs.getString('userFirebaseUid');
+
+      exceededWaterLimit = prefs.getBool('exceededWaterLimit');
 
       dailyWaterLimit = prefs.getDouble('dailyWaterLimit');
       waterBottleCapacity = prefs.getDouble('waterBottleCapacity');
@@ -213,15 +216,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _updateWaterLimitData() async {
-    setState(() {
-      lastWaterDrinkingTime =
-          DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-    });
-    await prefs.setString('lastWaterDrinkingTime', lastWaterDrinkingTime!);
+    await prefs.remove('lastWaterDrinkingTime');
     await prefs.setDouble('dailyWaterLimit', dailyWaterLimit!);
     await prefs.setInt('drankWaterBottle', drankWaterBottle);
     await prefs.setStringList('waterBottleItemStates',
         waterBottleItemStates.map((e) => e.toString()).toList());
+    await prefs.setBool('exceededWaterLimit', exceededWaterLimit!);
   }
 
   void _updateGreeting() {
@@ -269,15 +269,21 @@ class _HomePageState extends State<HomePage> {
 
   void _startDayChangeCheck() {
     // Check every minute
-    _dayCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+    _dayCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) async {
       final newDay = DateFormat('yyyy-MM-dd').format(DateTime.now());
       if (newDay != currentDay) {
-        // Day has changed
-        _nutritionStorage.storeCurrentDayNutrition(currentDay!);
-        setState(() async {
+        debugPrint('Day has changed');
+
+        await _nutritionStorage.storeCurrentDayNutrition(currentDay!);
+
+        debugPrint('Stored nutrition data of current day: $currentDay');
+
+        setState(() {
           currentDay = newDay;
-          await prefs.setString('currentDay', currentDay!);
         });
+        await prefs.setString('currentDay', currentDay!);
+
+        debugPrint('New day: $currentDay');
       }
     });
   }
@@ -558,6 +564,8 @@ class _HomePageState extends State<HomePage> {
                                                   waterBottleItemCount,
                                                   (_) => false,
                                                 );
+                                                exceededWaterLimit = false;
+                                                lastWaterDrinkingTime = null;
                                               });
 
                                               await _updateWaterLimitData();
@@ -614,25 +622,30 @@ class _HomePageState extends State<HomePage> {
                               padding: const EdgeInsets.only(top: 10),
                               child: SizedBox(
                                 height: deviceSize.height * 0.15,
-                                child: GridView.builder(
-                                  padding: EdgeInsets.zero,
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        6, // Number of items per row
-                                    crossAxisSpacing:
-                                        2, // Space between items horizontally
-                                    mainAxisSpacing: 5, // Space between rows
-                                  ),
-                                  itemCount: waterBottleItemCount,
-                                  itemBuilder: (context, index) => GridItem(
-                                    index: index,
-                                    isPressed: waterBottleItemStates[index],
-                                    onToggle: (isPressed) =>
-                                        _updateWaterBottleCount(
-                                            index, isPressed),
-                                  ),
-                                ),
+                                child: (exceededWaterLimit != true)
+                                    ? GridView.builder(
+                                        padding: EdgeInsets.zero,
+                                        gridDelegate:
+                                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount:
+                                              6, // Number of items per row
+                                          crossAxisSpacing:
+                                              2, // Space between items horizontally
+                                          mainAxisSpacing:
+                                              5, // Space between rows
+                                        ),
+                                        itemCount: waterBottleItemCount,
+                                        itemBuilder: (context, index) =>
+                                            GridItem(
+                                          index: index,
+                                          isPressed:
+                                              waterBottleItemStates[index],
+                                          onToggle: (isPressed) =>
+                                              _updateWaterBottleCount(
+                                                  index, isPressed),
+                                        ),
+                                      )
+                                    : null,
                               ),
                             ),
                           ],
@@ -697,40 +710,50 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _waterTextWidget() {
-    if (lastWaterDrinkingTime != null) {
-      if (lastWaterDrinkingMin <= 0 &&
-          lastWaterDrinkingHour <= 0 &&
-          lastWaterDrinkingDay <= 0) {
-        // Pass
-      } else if (lastWaterDrinkingDay == 0 && lastWaterDrinkingHour == 0) {
-        // Show only minutes
-        return Text(
-          "You haven't been hydrated since $lastWaterDrinkingMin minutes. Don't forget your daily intake!",
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: ColorPalette.green),
-        );
-      } else if (lastWaterDrinkingDay == 0) {
-        // Show hours and minutes
-        return Text(
-          "You haven't been hydrated since $lastWaterDrinkingHour hours and $lastWaterDrinkingMin minutes. Don't forget your daily intake!",
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: ColorPalette.green),
-        );
-      } else {
-        return Text(
-          "You haven't been hydrated since $lastWaterDrinkingDay days, $lastWaterDrinkingHour hours, and $lastWaterDrinkingMin minutes. Don't forget your daily intake!",
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: ColorPalette.green),
-        );
+    if (exceededWaterLimit != true) {
+      if (lastWaterDrinkingTime != null) {
+        if (lastWaterDrinkingMin <= 0 &&
+            lastWaterDrinkingHour <= 0 &&
+            lastWaterDrinkingDay <= 0) {
+          // Pass
+        } else if (lastWaterDrinkingDay == 0 && lastWaterDrinkingHour == 0) {
+          // Show only minutes
+          return Text(
+            "You haven't been hydrated since $lastWaterDrinkingMin minutes. Don't forget your daily intake!",
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: ColorPalette.green),
+          );
+        } else if (lastWaterDrinkingDay == 0) {
+          // Show hours and minutes
+          return Text(
+            "You haven't been hydrated since $lastWaterDrinkingHour hours and $lastWaterDrinkingMin minutes. Don't forget your daily intake!",
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: ColorPalette.green),
+          );
+        } else {
+          return Text(
+            "You haven't been hydrated since $lastWaterDrinkingDay days, $lastWaterDrinkingHour hours, and $lastWaterDrinkingMin minutes. Don't forget your daily intake!",
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: ColorPalette.green),
+          );
+        }
       }
+      return const Text(
+        "A well-hydrated body is the key to clear thinking and boundless energy — don't forget your daily water intake!",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: ColorPalette.green,
+        ),
+      );
+    } else {
+      return const Text(
+        "You have exceeded your daily water intake limit!",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: ColorPalette.green,
+        ),
+      );
     }
-    return const Text(
-      "A well-hydrated body is the key to clear thinking and boundless energy — don't forget your daily water intake!",
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        color: ColorPalette.green,
-      ),
-    );
   }
 
   void _openNutritionSettings({

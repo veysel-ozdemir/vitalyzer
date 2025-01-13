@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/controller/user_nutrition_controller.dart';
 import 'package:vitalyzer/model/user_nutrition.dart';
@@ -29,6 +30,8 @@ class NutritionStorageService {
 
     // If nutrition data already exists, update it. Otherwise, create new entry
     if (existingNutrition != null) {
+      debugPrint('Nutrition data already exists, updating...');
+
       await _nutritionController.updateUserNutrition(UserNutrition(
         nutritionId: existingNutrition.nutritionId,
         userId: userProfileId,
@@ -52,6 +55,8 @@ class NutritionStorageService {
         bmiAdvice: prefs.getString('bmiAdvice'),
       ));
     } else {
+      debugPrint('Nutrition data does not exists, creating new entry...');
+
       await _nutritionController.createUserNutrition(UserNutrition(
         userId: userProfileId,
         date: DateTime.parse(today),
@@ -77,6 +82,8 @@ class NutritionStorageService {
 
     // Reset daily values after storing
     await _resetDailyValues(prefs);
+
+    debugPrint('Reset daily values');
   }
 
   Future<void> _resetDailyValues(SharedPreferences prefs) async {
@@ -87,6 +94,9 @@ class NutritionStorageService {
     await prefs.setDouble('gainedProteinGram', 0.0);
     await prefs.setDouble('gainedFatGram', 0.0);
     await prefs.setInt('drankWaterBottle', 0);
+    await prefs.setBool('exceededWaterLimit', false);
+    await prefs.setString(
+        'currentDay', DateFormat('yyyy-MM-dd').format(DateTime.now()));
     await prefs.remove('waterBottleItemStates');
   }
 }

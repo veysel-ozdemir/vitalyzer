@@ -36,8 +36,13 @@ class GeminiService {
 
   Future<String> scanWaterBottle(Uint8List imageBytes) async {
     try {
-      const prompt =
-          'Analyze this water bottle image and, if visible, provide the amount of water drunk in L. If the capacity is not clearly visible, provide the estimated amount in L, which should be rounded to nearest 0.5L.';
+      const prompt = '''
+        Analyze this water bottle image and, if visible, provide the amount of water drunk in L.
+        If the capacity is not clearly visible, provide the estimated amount in L, which should be rounded to nearest 0.5L.
+        If the water bottle is clearly empty, assume that the whole bottle is consumed.
+        In addition to the text of description, clearly state the estimated amount in the following format:
+        - Estimated water drunk: [estimated amount in L, which should be rounded to nearest 0.5L]
+      ''';
       final content = [
         Content.text(prompt),
         Content.data('image/jpeg', imageBytes),

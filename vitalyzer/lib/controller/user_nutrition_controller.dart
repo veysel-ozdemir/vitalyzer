@@ -150,14 +150,23 @@ class UserNutritionController extends GetxController {
         // Set the water states
         final waterBottleItemCount =
             (dailyWaterLimit / waterBottleCapacity).toInt();
+
+        int count = drankWaterBottle;
         await prefs.setStringList(
-            'waterBottleItemStates',
-            List.generate(waterBottleItemCount, (_) {
-              if ((drankWaterBottle--) > 0) {
-                return true;
-              }
-              return false;
-            }).map((e) => e.toString()).toList());
+          'waterBottleItemStates',
+          List.generate(waterBottleItemCount, (_) {
+            if ((count--) > 0) {
+              return true;
+            }
+            return false;
+          }).map((e) => e.toString()).toList(),
+        );
+        if (drankWaterBottle <= waterBottleItemCount) {
+          await prefs.setBool('exceededWaterLimit', false);
+        } else {
+          debugPrint('Daily water limit exceeded!');
+          await prefs.setBool('exceededWaterLimit', true);
+        }
 
         // Set limit values
         await prefs.setDouble('dailyWaterLimit', todayNutrition.waterLimit);
@@ -200,6 +209,7 @@ class UserNutritionController extends GetxController {
         await prefs.setDouble('gainedProteinGram', 0.0);
         await prefs.setDouble('gainedFatGram', 0.0);
         await prefs.setInt('drankWaterBottle', 0);
+        await prefs.setBool('exceededWaterLimit', false);
 
         // Create new nutrition record for today with zero gains
         final newNutrition = UserNutrition(

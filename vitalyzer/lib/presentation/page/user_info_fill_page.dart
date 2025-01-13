@@ -66,6 +66,8 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
 
     await prefs.setInt('drankWaterBottle', 0);
 
+    await prefs.setBool('exceededWaterLimit', false);
+
     await prefs.setDouble('gainedCarbsCalorie', 0.0);
     await prefs.setDouble('gainedProteinCalorie', 0.0);
     await prefs.setDouble('gainedFatCalorie', 0.0);
