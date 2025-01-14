@@ -7,7 +7,6 @@ import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/nutrition_controller.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/presentation/widget/user_info_container.dart';
-import 'package:vitalyzer/util/extension.dart';
 import 'package:vitalyzer/util/funtions.dart';
 
 class UserInfoFillPage extends StatefulWidget {
@@ -99,8 +98,6 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = context.deviceSize;
-
     return Scaffold(
       backgroundColor: ColorPalette.beige,
       resizeToAvoidBottomInset: false,
@@ -254,8 +251,8 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                       }
                     : null,
                 style: ButtonStyle(
-                  fixedSize: WidgetStatePropertyAll(
-                      Size.fromWidth(deviceSize.width * 0.5)),
+                  fixedSize:
+                      WidgetStatePropertyAll(Size.fromWidth(Get.width * 0.5)),
                   backgroundColor: isSelectionComplete
                       ? const WidgetStatePropertyAll(ColorPalette.green)
                       : WidgetStatePropertyAll(
@@ -358,7 +355,6 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     // Initialize scroll controller with previously selected age or default to 35
     FixedExtentScrollController scrollController =
         FixedExtentScrollController(initialItem: selectedAge ?? 35);
-    final deviceSize = context.deviceSize;
 
     // Set initial age only if it hasn't been set before
     int age = selectedAge ?? 35;
@@ -433,7 +429,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                           ),
                           // Fixed "years" text overlay
                           Positioned(
-                            right: deviceSize.width * 0.25,
+                            right: Get.width * 0.25,
                             child: const Text(
                               'years',
                               style: TextStyle(
@@ -450,7 +446,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                       ? ElevatedButton(
                           style: ButtonStyle(
                             fixedSize: WidgetStatePropertyAll(
-                                Size.fromWidth(deviceSize.width * 0.5)),
+                                Size.fromWidth(Get.width * 0.5)),
                             backgroundColor: const WidgetStatePropertyAll(
                                 ColorPalette.green),
                           ),
@@ -492,7 +488,6 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
     FixedExtentScrollController scrollController = FixedExtentScrollController(
       initialItem: (selectedHeight ?? 170) - minHeight,
     );
-    final deviceSize = context.deviceSize;
 
     // Set initial height only if it hasn't been set before
     int height = selectedHeight ?? 170;
@@ -567,7 +562,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                           ),
                           // Fixed "cm" text overlay
                           Positioned(
-                            right: deviceSize.width * 0.25,
+                            right: Get.width * 0.25,
                             child: const Text(
                               'cm',
                               style: TextStyle(
@@ -583,7 +578,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                   ElevatedButton(
                     style: ButtonStyle(
                       fixedSize: WidgetStatePropertyAll(
-                        Size.fromWidth(deviceSize.width * 0.5),
+                        Size.fromWidth(Get.width * 0.5),
                       ),
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),
@@ -630,8 +625,6 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
         FixedExtentScrollController(
       initialItem: initialFractionPart,
     );
-
-    final deviceSize = context.deviceSize;
 
     // Set initial weight only if it hasn't been set before
     double weight =
@@ -786,7 +779,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                             ),
                           ),
                           Positioned(
-                            right: deviceSize.width * 0.1,
+                            right: Get.width * 0.1,
                             child: const Text(
                               'kg',
                               style: TextStyle(
@@ -802,7 +795,7 @@ class _UserInfoFillPageState extends State<UserInfoFillPage> {
                   ElevatedButton(
                     style: ButtonStyle(
                       fixedSize: WidgetStatePropertyAll(
-                        Size.fromWidth(deviceSize.width * 0.5),
+                        Size.fromWidth(Get.width * 0.5),
                       ),
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),

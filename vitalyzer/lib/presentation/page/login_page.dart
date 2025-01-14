@@ -9,7 +9,6 @@ import 'package:vitalyzer/controller/user_profile_controller.dart';
 import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/presentation/page/user_info_fill_page.dart';
-import 'package:vitalyzer/util/extension.dart';
 import 'package:vitalyzer/service/auth_service.dart';
 import 'package:vitalyzer/util/funtions.dart';
 import 'package:vitalyzer/presentation/page/forgot_password_page.dart';
@@ -101,8 +100,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = context.deviceSize;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: ColorPalette.beige,
@@ -265,8 +262,8 @@ class _LoginPageState extends State<LoginPage> {
                   style: ButtonStyle(
                     backgroundColor:
                         const WidgetStatePropertyAll(ColorPalette.green),
-                    fixedSize: WidgetStatePropertyAll(
-                        Size.fromWidth(deviceSize.width * 0.5)),
+                    fixedSize:
+                        WidgetStatePropertyAll(Size.fromWidth(Get.width * 0.5)),
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator(

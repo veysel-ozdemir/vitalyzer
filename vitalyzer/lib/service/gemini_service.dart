@@ -108,14 +108,16 @@ class GeminiService {
     - Gender: $gender
     - Age: $age years
 
-    Please provide a personalized medical advice that includes:
-    1. A brief explanation of their current BMI status and what it means for their health
-    2. Potential health risks associated with their current BMI category
-    3. Specific, actionable recommendations to achieve/maintain a healthy weight
-    4. Motivational message to encourage them on their health journey
+    Please provide a personalized medical advice that includes following topics and in the specified format:
+    (x) [Title of the topic]:[A brief explanation of their current BMI status and what it means for their health]
+    (x) [Title of the topic]:[Potential health risks associated with their current BMI category]
+    (x) [Title of the topic]:[Specific, actionable recommendations to achieve/maintain a healthy weight]
+    (x) [Title of the topic]:[Motivational message to encourage them on their health journey]
 
     Keep the tone professional yet empathetic and encouraging. Make the advice practical and achievable.
     Do not include greeting or thanking sentences. Just start with the personalized medical advice text.
+    Comply to the specified format precisely. The (x) symbol is for distinguishing each topic.
+    Do NOT replace the symbol '(x)' with something else like (1), (2), etc.
     ''';
 
     try {

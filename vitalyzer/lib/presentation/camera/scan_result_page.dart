@@ -30,38 +30,40 @@ class ScanResultPage extends GetView<ScanController> {
                 padding: const EdgeInsets.all(25),
                 child: Column(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: ColorPalette.lightGreen.withOpacity(0.5),
-                        border: Border.all(
-                            color: ColorPalette.lightGreen, width: 3),
-                      ),
-                      height: Get.height * 0.5,
-                      width: Get.width,
-                      child: Scrollbar(
-                        controller: _scrollController,
-                        scrollbarOrientation: ScrollbarOrientation.right,
-                        trackVisibility: true,
-                        interactive: true,
-                        thickness: 6,
-                        radius: const Radius.circular(30),
-                        child: SingleChildScrollView(
+                    ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: Get.height * 0.5),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: ColorPalette.lightGreen.withOpacity(0.5),
+                          border: Border.all(
+                              color: ColorPalette.lightGreen, width: 3),
+                        ),
+                        width: Get.width,
+                        child: Scrollbar(
                           controller: _scrollController,
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MarkdownBody(
-                                data: controller.analysisResult.value,
-                                styleSheet: MarkdownStyleSheet(
-                                  p: const TextStyle(
-                                    fontSize: 16,
-                                    color: ColorPalette.green,
+                          scrollbarOrientation: ScrollbarOrientation.right,
+                          trackVisibility: true,
+                          interactive: true,
+                          thickness: 6,
+                          radius: const Radius.circular(30),
+                          child: SingleChildScrollView(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MarkdownBody(
+                                  data: controller.analysisResult.value,
+                                  styleSheet: MarkdownStyleSheet(
+                                    p: const TextStyle(
+                                      fontSize: 16,
+                                      color: ColorPalette.green,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),

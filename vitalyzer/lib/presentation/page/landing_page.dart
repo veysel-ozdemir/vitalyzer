@@ -5,7 +5,6 @@ import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/presentation/page/login_page.dart';
 import 'package:vitalyzer/presentation/page/register_page.dart';
 import 'package:vitalyzer/presentation/page/user_info_fill_page.dart';
-import 'package:vitalyzer/util/extension.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -32,8 +31,6 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = context.deviceSize;
-
     return Scaffold(
       backgroundColor: ColorPalette.beige,
       body: Padding(
@@ -93,7 +90,7 @@ class _LandingPageState extends State<LandingPage> {
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),
                       fixedSize: WidgetStatePropertyAll(
-                          Size.fromWidth(deviceSize.width * 0.5)),
+                          Size.fromWidth(Get.width * 0.5)),
                     ),
                     child: const Text(
                       'Start Now',

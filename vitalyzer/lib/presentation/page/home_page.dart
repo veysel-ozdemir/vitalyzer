@@ -16,7 +16,6 @@ import 'package:vitalyzer/presentation/page/profile_page.dart';
 import 'package:vitalyzer/presentation/widget/grid_item.dart';
 import 'package:vitalyzer/presentation/widget/nutrient_bar_chart.dart';
 import 'package:vitalyzer/presentation/widget/nutrient_pie_chart.dart';
-import 'package:vitalyzer/util/extension.dart';
 import 'package:intl/intl.dart';
 import 'package:vitalyzer/service/nutrition_storage_service.dart';
 import 'package:vitalyzer/util/scan_option.dart';
@@ -301,8 +300,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = context.deviceSize;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: ColorPalette.beige,
@@ -625,7 +622,7 @@ class _HomePageState extends State<HomePage> {
                             Padding(
                               padding: const EdgeInsets.only(top: 10),
                               child: SizedBox(
-                                height: deviceSize.height * 0.15,
+                                height: Get.height * 0.15,
                                 child: (exceededWaterLimit != true)
                                     ? GridView.builder(
                                         padding: EdgeInsets.zero,
@@ -668,8 +665,8 @@ class _HomePageState extends State<HomePage> {
                             child: Container(
                               alignment: Alignment.center,
                               padding: const EdgeInsets.all(5),
-                              height: deviceSize.height * 0.075,
-                              width: deviceSize.height * 0.075,
+                              height: Get.height * 0.075,
+                              width: Get.height * 0.075,
                               child: Image.asset(
                                   'assets/illustrations/checklist.png'),
                             ),
@@ -683,8 +680,8 @@ class _HomePageState extends State<HomePage> {
                             ),
                             child: Container(
                               alignment: Alignment.center,
-                              height: deviceSize.height * 0.075,
-                              width: deviceSize.height * 0.075,
+                              height: Get.height * 0.075,
+                              width: Get.height * 0.075,
                               child: Image.asset(
                                   'assets/illustrations/camera.png'),
                             ),
@@ -696,8 +693,8 @@ class _HomePageState extends State<HomePage> {
                             child: Container(
                               alignment: Alignment.center,
                               padding: const EdgeInsets.all(5),
-                              height: deviceSize.height * 0.075,
-                              width: deviceSize.height * 0.075,
+                              height: Get.height * 0.075,
+                              width: Get.height * 0.075,
                               child: Image.asset(
                                   'assets/illustrations/analytics.png'),
                             ),
@@ -781,8 +778,6 @@ class _HomePageState extends State<HomePage> {
         FixedExtentScrollController(
       initialItem: initialFractionPart,
     );
-
-    final deviceSize = context.deviceSize;
 
     double calorieLimit = dailyCalorieLimit;
 
@@ -935,7 +930,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Positioned(
-                            right: deviceSize.width * 0.1,
+                            right: Get.width * 0.1,
                             child: const Text(
                               'kcal',
                               style: TextStyle(
@@ -951,7 +946,7 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                     style: ButtonStyle(
                       fixedSize: WidgetStatePropertyAll(
-                        Size.fromWidth(deviceSize.width * 0.5),
+                        Size.fromWidth(Get.width * 0.5),
                       ),
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),
@@ -994,8 +989,6 @@ class _HomePageState extends State<HomePage> {
         FixedExtentScrollController(
       initialItem: initialFractionPart,
     );
-
-    final deviceSize = context.deviceSize;
 
     double waterLimit = dailyWaterLimit!;
 
@@ -1149,7 +1142,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Positioned(
-                            right: deviceSize.width * 0.1,
+                            right: Get.width * 0.1,
                             child: const Text(
                               'L',
                               style: TextStyle(
@@ -1166,7 +1159,7 @@ class _HomePageState extends State<HomePage> {
                       ? ElevatedButton(
                           style: ButtonStyle(
                             fixedSize: WidgetStatePropertyAll(
-                              Size.fromWidth(deviceSize.width * 0.5),
+                              Size.fromWidth(Get.width * 0.5),
                             ),
                             backgroundColor: const WidgetStatePropertyAll(
                                 ColorPalette.green),

@@ -15,7 +15,6 @@ import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/landing_page.dart';
 import 'package:vitalyzer/presentation/widget/user_info_item.dart';
 import 'package:vitalyzer/service/auth_service.dart';
-import 'package:vitalyzer/util/extension.dart';
 import 'package:vitalyzer/util/funtions.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -1032,7 +1031,6 @@ class _ProfilePageState extends State<ProfilePage> {
     // Initialize scroll controller with previously selected age or default to 35
     FixedExtentScrollController scrollController =
         FixedExtentScrollController(initialItem: selectedAge ?? 35);
-    final deviceSize = context.deviceSize;
 
     // Set initial age only if it hasn't been set before
     int age = selectedAge ?? 35;
@@ -1107,7 +1105,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           // Fixed "years" text overlay
                           Positioned(
-                            right: deviceSize.width * 0.25,
+                            right: Get.width * 0.25,
                             child: const Text(
                               'years',
                               style: TextStyle(
@@ -1124,7 +1122,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ? ElevatedButton(
                           style: ButtonStyle(
                             fixedSize: WidgetStatePropertyAll(
-                                Size.fromWidth(deviceSize.width * 0.5)),
+                                Size.fromWidth(Get.width * 0.5)),
                             backgroundColor: const WidgetStatePropertyAll(
                                 ColorPalette.green),
                           ),
@@ -1166,7 +1164,6 @@ class _ProfilePageState extends State<ProfilePage> {
     FixedExtentScrollController scrollController = FixedExtentScrollController(
       initialItem: (selectedHeight ?? 170) - minHeight,
     );
-    final deviceSize = context.deviceSize;
 
     // Set initial height only if it hasn't been set before
     int height = selectedHeight ?? 170;
@@ -1241,7 +1238,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           // Fixed "cm" text overlay
                           Positioned(
-                            right: deviceSize.width * 0.25,
+                            right: Get.width * 0.25,
                             child: const Text(
                               'cm',
                               style: TextStyle(
@@ -1257,7 +1254,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ElevatedButton(
                     style: ButtonStyle(
                       fixedSize: WidgetStatePropertyAll(
-                        Size.fromWidth(deviceSize.width * 0.5),
+                        Size.fromWidth(Get.width * 0.5),
                       ),
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),
@@ -1304,8 +1301,6 @@ class _ProfilePageState extends State<ProfilePage> {
         FixedExtentScrollController(
       initialItem: initialFractionPart,
     );
-
-    final deviceSize = context.deviceSize;
 
     // Set initial weight only if it hasn't been set before
     double weight =
@@ -1460,7 +1455,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                           Positioned(
-                            right: deviceSize.width * 0.1,
+                            right: Get.width * 0.1,
                             child: const Text(
                               'kg',
                               style: TextStyle(
@@ -1476,7 +1471,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ElevatedButton(
                     style: ButtonStyle(
                       fixedSize: WidgetStatePropertyAll(
-                        Size.fromWidth(deviceSize.width * 0.5),
+                        Size.fromWidth(Get.width * 0.5),
                       ),
                       backgroundColor:
                           const WidgetStatePropertyAll(ColorPalette.green),

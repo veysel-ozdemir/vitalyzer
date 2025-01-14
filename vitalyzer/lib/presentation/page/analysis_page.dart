@@ -20,7 +20,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
   late SharedPreferences prefs;
   double? bodyMassIndexLevel;
   String? bmiAdvice;
-  final _scrollController = ScrollController();
+  List<String> parsedText = [];
 
   @override
   void initState() {
@@ -33,6 +33,17 @@ class _AnalysisPageState extends State<AnalysisPage> {
     setState(() {
       bodyMassIndexLevel = prefs.getDouble('bodyMassIndexLevel');
       bmiAdvice = prefs.getString('bmiAdvice');
+    });
+    await _parseText(text: bmiAdvice!);
+  }
+
+  Future<void> _parseText({required String text}) async {
+    setState(() {
+      parsedText = text
+          .split('(x)') // Split at each "(x)"
+          .map((part) => part.trim()) // Trim whitespace from each part
+          .where((part) => part.isNotEmpty) // Remove empty strings
+          .toList(); // Convert to a list
       _isLoading = false;
     });
   }
@@ -58,70 +69,82 @@ class _AnalysisPageState extends State<AnalysisPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     BMIGauge(bmiValue: bodyMassIndexLevel!),
-                    const Spacer(flex: 1),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: ColorPalette.lightGreen.withOpacity(0.5),
-                        border: Border.all(
-                            color: ColorPalette.lightGreen, width: 3),
-                      ),
-                      height: Get.height * 0.25,
-                      width: Get.width,
-                      child: Scrollbar(
-                        controller: _scrollController,
-                        scrollbarOrientation: ScrollbarOrientation.right,
-                        trackVisibility: true,
-                        interactive: true,
-                        thickness: 6,
-                        radius: const Radius.circular(30),
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.all(15),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              MarkdownBody(
-                                data: bmiAdvice!,
-                                styleSheet: MarkdownStyleSheet(
-                                  p: const TextStyle(
-                                    fontSize: 14,
-                                    color: ColorPalette.darkGreen,
-                                  ),
-                                ),
-                              ),
-                            ],
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 25),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          gradient: LinearGradient(colors: [
+                            Colors.blue,
+                            Colors.green,
+                            Colors.yellow,
+                            Colors.orange,
+                            Colors.red,
+                          ]),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () => _openCalculator(),
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateColor.transparent,
+                            shadowColor: WidgetStateColor.transparent,
+                            fixedSize: WidgetStatePropertyAll(
+                              Size.fromWidth(Get.width * 0.5),
+                            ),
+                          ),
+                          child: const Text(
+                            'Custom Calculation',
+                            style: TextStyle(color: ColorPalette.beige),
                           ),
                         ),
                       ),
                     ),
-                    const Spacer(flex: 2),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 25, bottom: 25),
-                      child: ElevatedButton(
-                        onPressed: () => _openCalculator(),
-                        style: ButtonStyle(
-                          elevation: const WidgetStatePropertyAll(5),
-                          shape: WidgetStatePropertyAll(
-                            BeveledRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(
-                                  color: ColorPalette.green, width: 1.5),
-                            ),
-                          ),
-                          backgroundColor:
-                              const WidgetStatePropertyAll(ColorPalette.beige),
-                          fixedSize: WidgetStatePropertyAll(
-                            Size.fromWidth(Get.width * 0.5),
-                          ),
-                        ),
-                        child: const Text(
-                          'Custom Calculation',
-                          style: TextStyle(
-                            color: ColorPalette.green,
-                          ),
-                        ),
-                      ),
+                    Expanded(
+                      child: ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(width: 10),
+                          itemCount: parsedText.length,
+                          itemBuilder: (context, index) {
+                            var scrollController = ScrollController();
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: ColorPalette.lightGreen.withOpacity(0.5),
+                                border: Border.all(
+                                    color: ColorPalette.lightGreen, width: 3),
+                              ),
+                              height: Get.height,
+                              width: Get.width * 0.75,
+                              child: Scrollbar(
+                                controller: scrollController,
+                                scrollbarOrientation:
+                                    ScrollbarOrientation.right,
+                                trackVisibility: true,
+                                interactive: true,
+                                thickness: 6,
+                                radius: const Radius.circular(30),
+                                child: SingleChildScrollView(
+                                  controller: scrollController,
+                                  padding: const EdgeInsets.all(15),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      MarkdownBody(
+                                        data: parsedText[index],
+                                        styleSheet: MarkdownStyleSheet(
+                                          p: const TextStyle(
+                                            fontSize: 14,
+                                            color: ColorPalette.darkGreen,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
                     ),
                   ],
                 ),

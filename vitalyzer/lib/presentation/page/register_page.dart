@@ -15,7 +15,6 @@ import 'package:vitalyzer/model/user_nutrition.dart';
 import 'package:vitalyzer/model/user_profile.dart';
 import 'package:vitalyzer/presentation/page/home_page.dart';
 import 'package:vitalyzer/presentation/page/login_page.dart';
-import 'package:vitalyzer/util/extension.dart';
 import 'package:vitalyzer/service/auth_service.dart';
 import 'package:vitalyzer/util/funtions.dart';
 
@@ -184,8 +183,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = context.deviceSize;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: ColorPalette.beige,
@@ -446,8 +443,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   style: ButtonStyle(
                     backgroundColor:
                         const WidgetStatePropertyAll(ColorPalette.green),
-                    fixedSize: WidgetStatePropertyAll(
-                        Size.fromWidth(deviceSize.width * 0.5)),
+                    fixedSize:
+                        WidgetStatePropertyAll(Size.fromWidth(Get.width * 0.5)),
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator(

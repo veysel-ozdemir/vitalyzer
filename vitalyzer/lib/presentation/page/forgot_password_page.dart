@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/service/auth_service.dart';
-import 'package:vitalyzer/util/extension.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -49,8 +48,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = context.deviceSize;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: ColorPalette.beige,
@@ -158,7 +155,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 backgroundColor:
                     const WidgetStatePropertyAll(ColorPalette.green),
                 fixedSize: WidgetStatePropertyAll(
-                  Size.fromWidth(deviceSize.width * 0.5),
+                  Size.fromWidth(Get.width * 0.5),
                 ),
               ),
               child: _isLoading
