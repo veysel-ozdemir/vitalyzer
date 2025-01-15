@@ -109,10 +109,10 @@ class GeminiService {
     - Age: $age years
 
     Please provide a personalized medical advice that includes following topics and in the specified format:
-    (x) [Title of the topic]:[A brief explanation of their current BMI status and what it means for their health]
-    (x) [Title of the topic]:[Potential health risks associated with their current BMI category]
-    (x) [Title of the topic]:[Specific, actionable recommendations to achieve/maintain a healthy weight]
-    (x) [Title of the topic]:[Motivational message to encourage them on their health journey]
+    (x) **Title of the topic**:[A brief explanation of their current BMI status and what it means for their health]
+    (x) **Title of the topic**:[Potential health risks associated with their current BMI category]
+    (x) **Title of the topic**:[Specific, actionable recommendations to achieve/maintain a healthy weight]
+    (x) **Title of the topic**:[Motivational message to encourage them on their health journey]
 
     Keep the tone professional yet empathetic and encouraging. Make the advice practical and achievable.
     Do not include greeting or thanking sentences. Just start with the personalized medical advice text.

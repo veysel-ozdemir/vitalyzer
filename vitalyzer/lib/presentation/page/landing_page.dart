@@ -41,31 +41,32 @@ class _LandingPageState extends State<LandingPage> {
           child: Column(
             children: [
               const Spacer(flex: 10),
-              Container(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  height: Get.width * 0.3,
-                  width: Get.width * 0.3,
-                  decoration: BoxDecoration(
-                    color: ColorPalette.lightGreen.withOpacity(0.5),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: ColorPalette.darkGreen,
-                      width: 3,
-                    ),
-                  ),
-                  child: Center(
-                    child: IconButton(
-                      onPressed: null,
-                      enableFeedback: false,
-                      icon: Icon(
-                        Icons.health_and_safety,
-                        size: Get.width * 0.2,
-                        color: ColorPalette.green,
+              Stack(
+                children: [
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      height: Get.width * 0.35,
+                      width: Get.width * 0.35,
+                      decoration: BoxDecoration(
+                        color: ColorPalette.lightGreen.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: ColorPalette.darkGreen,
+                          width: 3,
+                        ),
                       ),
+                      child: null,
                     ),
                   ),
-                ),
+                  SizedBox(
+                    height: Get.width * 0.35,
+                    width: Get.width * 0.35,
+                    child: Center(
+                      child: Image.asset('assets/icons/logo.png'),
+                    ),
+                  ),
+                ],
               ),
               const Spacer(flex: 1),
               Container(

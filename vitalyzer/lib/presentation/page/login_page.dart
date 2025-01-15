@@ -111,28 +111,29 @@ class _LoginPageState extends State<LoginPage> {
             const Spacer(flex: 1),
             Container(
               alignment: Alignment.center,
-              child: Container(
-                height: Get.width * 0.25,
-                width: Get.width * 0.25,
-                decoration: BoxDecoration(
-                  color: ColorPalette.lightGreen.withOpacity(0.5),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: ColorPalette.darkGreen,
-                    width: 3,
+              child: Stack(
+                children: [
+                  Container(
+                    height: Get.width * 0.25,
+                    width: Get.width * 0.25,
+                    decoration: BoxDecoration(
+                      color: ColorPalette.lightGreen.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: ColorPalette.darkGreen,
+                        width: 3,
+                      ),
+                    ),
+                    child: null,
                   ),
-                ),
-                child: Center(
-                  child: IconButton(
-                    onPressed: null,
-                    enableFeedback: false,
-                    icon: Icon(
-                      Icons.health_and_safety,
-                      size: Get.width * 0.175,
-                      color: ColorPalette.green,
+                  SizedBox(
+                    height: Get.width * 0.35,
+                    width: Get.width * 0.35,
+                    child: Center(
+                      child: Image.asset('assets/icons/logo.png'),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
             const Padding(
@@ -145,7 +146,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            const Spacer(flex: 1),
             Padding(
               padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
               child: TextFormField(
