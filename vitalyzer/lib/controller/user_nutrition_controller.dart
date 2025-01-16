@@ -42,6 +42,8 @@ class UserNutritionController extends GetxController {
         .indexWhere((n) => n.nutritionId == userNutrition.nutritionId);
     if (index != -1) {
       userNutritions[index] = userNutrition;
+    } else {
+      debugPrint('Index of nutrition: $index');
     }
   }
 

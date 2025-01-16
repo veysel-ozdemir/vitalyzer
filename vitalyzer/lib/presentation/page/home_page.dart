@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
   String greeting = '';
   late Timer _waterReminderTimer;
   late Timer _greetingCheckTimer;
-  Timer? _dayCheckTimer;
+  late Timer _dayCheckTimer;
   String? currentDay;
   final NutritionStorageService _nutritionStorage = NutritionStorageService();
 
@@ -83,7 +83,28 @@ class _HomePageState extends State<HomePage> {
     _waterReminderTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _updateWaterReminder();
     });
-    _startDayChangeCheck();
+    _dayCheckTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      debugPrint('Recorded Day: $currentDay');
+
+      final newDay = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+      debugPrint('Now: $newDay');
+
+      if (newDay != currentDay) {
+        debugPrint('Day has changed');
+
+        await _nutritionStorage.storeCurrentDayNutrition(currentDay!);
+
+        debugPrint('Stored nutrition data of current day: $currentDay');
+
+        setState(() {
+          currentDay = newDay;
+        });
+        await prefs.setString('currentDay', currentDay!);
+
+        debugPrint('New day: $currentDay');
+      }
+    });
   }
 
   Future<void> _loadSharedPrefsAndUserProfileData() async {
@@ -269,32 +290,11 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _startDayChangeCheck() {
-    // Check every minute
-    _dayCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) async {
-      final newDay = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      if (newDay != currentDay) {
-        debugPrint('Day has changed');
-
-        await _nutritionStorage.storeCurrentDayNutrition(currentDay!);
-
-        debugPrint('Stored nutrition data of current day: $currentDay');
-
-        setState(() {
-          currentDay = newDay;
-        });
-        await prefs.setString('currentDay', currentDay!);
-
-        debugPrint('New day: $currentDay');
-      }
-    });
-  }
-
   @override
   void dispose() {
     _waterReminderTimer.cancel();
     _greetingCheckTimer.cancel();
-    _dayCheckTimer?.cancel();
+    _dayCheckTimer.cancel();
     super.dispose();
   }
 
