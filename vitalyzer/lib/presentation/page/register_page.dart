@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/permission_controller.dart';
@@ -191,7 +192,6 @@ class _RegisterPageState extends State<RegisterPage> {
             const EdgeInsets.only(top: 50, bottom: 25, right: 25, left: 25),
         child: Column(
           children: [
-            const Spacer(flex: 1),
             Container(
               alignment: Alignment.center,
               child: Stack(
@@ -219,18 +219,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 ],
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(top: 25, left: 25, right: 25),
-              child: Text(
-                "Almost Done!",
-                style: TextStyle(
-                  color: ColorPalette.darkGreen,
-                  fontSize: 25,
-                ),
-              ),
-            ),
             Padding(
-              padding: const EdgeInsets.all(25),
+              padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
               child: TextFormField(
                 controller: _nameController,
                 style: const TextStyle(
@@ -270,7 +260,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
+              padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
               child: TextFormField(
                 controller: _emailController,
                 style: const TextStyle(
@@ -311,7 +301,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
+              padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
               child: TextFormField(
                 controller: _passwordController,
                 style: const TextStyle(
@@ -367,7 +357,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
+              padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
               child: TextFormField(
                 controller: _confirmPasswordController,
                 style: const TextStyle(
@@ -436,7 +426,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 color: ColorPalette.green.withOpacity(0.75),
               ),
             ),
-            const Spacer(flex: 2),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 15, bottom: 15),
+                child: Lottie.asset('assets/animations/register.json'),
+              ),
+            ),
             Column(
               children: [
                 ElevatedButton(

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/user_nutrition_controller.dart';
@@ -108,7 +109,6 @@ class _LoginPageState extends State<LoginPage> {
             const EdgeInsets.only(top: 50, bottom: 25, right: 25, left: 25),
         child: Column(
           children: [
-            const Spacer(flex: 1),
             Container(
               alignment: Alignment.center,
               child: Stack(
@@ -253,8 +253,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            const Spacer(flex: 1),
-            const Spacer(flex: 1),
+            Expanded(
+              child: Lottie.asset('assets/animations/login.json'),
+            ),
             Column(
               children: [
                 ElevatedButton(
