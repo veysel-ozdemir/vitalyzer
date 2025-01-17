@@ -61,7 +61,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
               child: CircularProgressIndicator(color: ColorPalette.lightGreen),
             )
           : Padding(
-              padding: const EdgeInsets.only(bottom: 25, right: 25, left: 25),
+              padding: const EdgeInsets.only(bottom: 50, right: 25, left: 25),
               child: SizedBox(
                 height: Get.height,
                 width: Get.width,

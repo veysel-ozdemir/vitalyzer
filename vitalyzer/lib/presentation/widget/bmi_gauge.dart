@@ -1,94 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:get/get.dart';
 import 'package:vitalyzer/const/color_palette.dart';
+import 'package:vitalyzer/presentation/widget/bmi_gauge_painter.dart';
 
-class BMIGauge extends StatelessWidget {
+class BMIGauge extends StatefulWidget {
   final double bmiValue;
 
   const BMIGauge({super.key, required this.bmiValue});
 
   @override
+  State<BMIGauge> createState() => _BMIGaugeState();
+}
+
+class _BMIGaugeState extends State<BMIGauge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 10, end: widget.bmiValue).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SfRadialGauge(
-          axes: <RadialAxis>[
-            RadialAxis(
-              minimum: 10,
-              maximum: 50,
-              ranges: <GaugeRange>[
-                GaugeRange(
-                  startValue: 10,
-                  endValue: 18.5,
-                  color: Colors.blue,
-                  label: '',
-                  labelStyle: const GaugeTextStyle(fontSize: 15),
+    return Container(
+      padding: const EdgeInsets.only(top: 15),
+      height: Get.height * 0.35,
+      child: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              return CustomPaint(
+                painter: BMIGaugePainter(bmiValue: _animation.value),
+                child: const SizedBox(
+                  width: double.infinity,
+                  height: double.infinity,
                 ),
-                GaugeRange(
-                  startValue: 18.5,
-                  endValue: 24.99,
-                  color: Colors.green,
-                  label: '',
-                  labelStyle: const GaugeTextStyle(fontSize: 15),
-                ),
-                GaugeRange(
-                  startValue: 25,
-                  endValue: 29.99,
-                  color: Colors.yellow,
-                  label: '',
-                  labelStyle: const GaugeTextStyle(fontSize: 15),
-                ),
-                GaugeRange(
-                  startValue: 30,
-                  endValue: 39.99,
-                  color: Colors.orange,
-                  label: '',
-                  labelStyle: const GaugeTextStyle(fontSize: 15),
-                ),
-                GaugeRange(
-                  startValue: 40,
-                  endValue: 50,
-                  color: Colors.red,
-                  label: '',
-                  labelStyle: const GaugeTextStyle(fontSize: 15),
-                ),
-              ],
-              pointers: <GaugePointer>[
-                NeedlePointer(
-                  value: bmiValue,
-                  enableAnimation: true,
-                ),
-              ],
-              annotations: <GaugeAnnotation>[
-                GaugeAnnotation(
-                  widget: Text(
-                    'BMI: $bmiValue',
-                    style: const TextStyle(
-                      color: ColorPalette.darkGreen,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+              );
+            },
+          ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Spacer(flex: 6),
+                Text(
+                  'BMI: ${widget.bmiValue.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    color: ColorPalette.darkGreen,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                  angle: 90,
-                  positionFactor: 0.5,
                 ),
-                GaugeAnnotation(
-                  widget: Text(
-                    _bmiCategory(bmiValue),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: _bmiColor(bmiValue),
-                    ),
+                const SizedBox(height: 8),
+                Text(
+                  _bmiCategory(widget.bmiValue),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _bmiColor(widget.bmiValue),
                   ),
-                  angle: 90,
-                  positionFactor: 0.75,
                 ),
+                const Spacer(flex: 1),
               ],
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 

@@ -22,7 +22,6 @@ dependencies:
   image: ^4.3.0
   permission_handler: ^11.3.1
   image_picker: ^1.1.2
-  syncfusion_flutter_gauges: ^28.1.33
   fl_chart: ^0.69.2
   flutter_svg: ^2.0.16
   sqflite: ^2.4.1
