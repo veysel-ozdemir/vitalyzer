@@ -36,8 +36,30 @@ class UserNutritionController extends GetxController {
     return await _userNutritionDao.getUserNutritionByDate(userId, date);
   }
 
+  Future<void> printAllNutritionRecords(int userId) async {
+    await loadUserNutritions(userId);
+    final nutritions = List<UserNutrition>.from(userNutritions);
+
+    if (nutritions.isEmpty) {
+      debugPrint('No nutrition records found for user ID: $userId');
+    } else {
+      debugPrint('Nutrition records for user ID: $userId');
+      for (var nutrition in nutritions) {
+        debugPrint('------ NUTRITION RECORD: ------');
+        debugPrint(nutrition.toString());
+        debugPrint('\n');
+      }
+      debugPrint('End of nutrition records for user ID: $userId');
+    }
+  }
+
   Future<void> updateUserNutrition(UserNutrition userNutrition) async {
+    debugPrint('Before update operation of user nutrition dao...');
+
     await _userNutritionDao.updateUserNutrition(userNutrition);
+
+    debugPrint('After update operation of user nutrition dao...');
+
     final index = userNutritions
         .indexWhere((n) => n.nutritionId == userNutrition.nutritionId);
     if (index != -1) {

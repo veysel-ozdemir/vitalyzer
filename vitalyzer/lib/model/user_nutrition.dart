@@ -88,4 +88,17 @@ class UserNutrition {
       bmiAdvice: map['BmiAdvice'],
     );
   }
+
+  @override
+  String toString() {
+    return 'UserNutrition(nutritionId: $nutritionId, userId: $userId, date: $date, '
+        'gainedCarbsCalorie: $gainedCarbsCalorie, gainedProteinCalorie: $gainedProteinCalorie, '
+        'gainedFatCalorie: $gainedFatCalorie, gainedCarbsGram: $gainedCarbsGram, '
+        'gainedProteinGram: $gainedProteinGram, gainedFatGram: $gainedFatGram, '
+        'consumedWater: $consumedWater, waterLimit: $waterLimit, '
+        'carbsGramLimit: $carbsGramLimit, proteinGramLimit: $proteinGramLimit, '
+        'fatGramLimit: $fatGramLimit, carbsCalorieLimit: $carbsCalorieLimit, '
+        'proteinCalorieLimit: $proteinCalorieLimit, fatCalorieLimit: $fatCalorieLimit, '
+        'bmiLevel: $bmiLevel, bmiAdvice: $bmiAdvice)';
+  }
 }

@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vitalyzer/const/color_palette.dart';
 import 'package:vitalyzer/controller/nutrition_controller.dart';
+import 'package:vitalyzer/controller/user_nutrition_controller.dart';
 import 'package:vitalyzer/controller/user_profile_controller.dart';
 import 'package:vitalyzer/model/user_profile.dart';
 import 'package:vitalyzer/presentation/camera/camera_screen.dart';
@@ -63,6 +64,7 @@ class _HomePageState extends State<HomePage> {
   late SharedPreferences prefs;
   final NutritionController _nutritionController = Get.find();
   final UserProfileController _userProfileController = Get.find();
+  final UserNutritionController _userNutritionController = Get.find();
   final _scrollController = ScrollController();
 
   String greeting = '';
@@ -92,6 +94,9 @@ class _HomePageState extends State<HomePage> {
 
       if (newDay != currentDay) {
         debugPrint('Day has changed');
+
+        await _userNutritionController
+            .printAllNutritionRecords(currentUserProfileId!);
 
         await _nutritionStorage.storeCurrentDayNutrition(currentDay!);
 
