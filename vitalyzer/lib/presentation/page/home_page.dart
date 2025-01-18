@@ -108,6 +108,10 @@ class _HomePageState extends State<HomePage> {
         await prefs.setString('currentDay', currentDay!);
 
         debugPrint('New day: $currentDay');
+
+        debugPrint('Loading shared prefs and user profile data...');
+
+        await _loadSharedPrefsAndUserProfileData();
       }
     });
   }
