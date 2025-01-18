@@ -84,9 +84,9 @@ class NutritionStorageService {
           bmiAdvice: prefs.getString('bmiAdvice'),
         ),
       );
-    }
 
-    await _nutritionController.printAllNutritionRecords(userProfileId);
+      await _nutritionController.printAllNutritionRecords(userProfileId);
+    }
 
     // Reset daily values after storing
     await _resetDailyValues(prefs);

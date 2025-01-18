@@ -188,6 +188,7 @@ class _HomePageState extends State<HomePage> {
           'Successfully loaded current user profile from local database');
 
       setState(() {
+        nameInitials = '';
         userProfilePhoto = currentUserProfile!.profilePhoto;
         var splitted = currentUserProfile!.fullName.split(' ');
         int count;
