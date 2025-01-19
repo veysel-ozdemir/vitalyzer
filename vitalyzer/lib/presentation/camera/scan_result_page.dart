@@ -30,8 +30,7 @@ class ScanResultPage extends GetView<ScanController> {
                 padding: const EdgeInsets.all(25),
                 child: Column(
                   children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: Get.height * 0.5),
+                    Expanded(
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
@@ -39,6 +38,7 @@ class ScanResultPage extends GetView<ScanController> {
                           border: Border.all(
                               color: ColorPalette.lightGreen, width: 3),
                         ),
+                        height: Get.height,
                         width: Get.width,
                         child: Scrollbar(
                           controller: _scrollController,
@@ -68,7 +68,7 @@ class ScanResultPage extends GetView<ScanController> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 15),
                     Center(
                       child: ElevatedButton(
                         onPressed: () async =>
@@ -87,9 +87,11 @@ class ScanResultPage extends GetView<ScanController> {
                             Icon(Icons.arrow_forward,
                                 color: ColorPalette.beige),
                             SizedBox(width: 10),
-                            Text('Home Page',
-                                style: TextStyle(
-                                    color: ColorPalette.beige, fontSize: 16)),
+                            Text(
+                              'Home Page',
+                              style: TextStyle(
+                                  color: ColorPalette.beige, fontSize: 16),
+                            ),
                           ],
                         ),
                       ),

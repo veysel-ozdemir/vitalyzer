@@ -65,7 +65,7 @@ Snapshots showcasing Vitalyzer's features and interfaces:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/veysel-ozdemir/senior-design-project.git
+   git clone https://github.com/veysel-ozdemir/vitalyzer-dev.git
    ```
 
 2. Naivgate to the application directory:
