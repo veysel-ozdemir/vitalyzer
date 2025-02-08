@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="images/app-logo.png" alt="App Logo" width="30%">
+</p>
+
 # Vitalyzer: AI-Powered Food Scanner and Calorie Tracker
 
 ## Contents
@@ -65,12 +69,12 @@ Snapshots showcasing Vitalyzer's features and interfaces:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/veysel-ozdemir/vitalyzer-dev.git
+   git clone https://github.com/veysel-ozdemir/vitalyzer.git
    ```
 
-2. Naivgate to the application directory:
+2. Naivgate to the application directory (*consciously made double directory change*):
    ```bash
-   cd vitalyzer
+   cd vitalyzer;cd vitalyzer
    ```
 
 3. Install dependencies
