@@ -131,4 +131,5 @@ For questions or collaboration, reach out at:
 - **Email:** ozdemirsoftware.dev@gmail.com
 - **GitHub:** [veysel-ozdemir](https://github.com/veysel-ozdemir/)
 - **LinkedIn:** [Veysel Ozdemir](https://www.linkedin.com/in/ozdemir-veysel/)
+- **Apple App Store:** [Developer Page](https://apps.apple.com/de/developer/veysel-ozdemir/id1791593374)
 - **Google Play Store:** [Developer Page](https://play.google.com/store/apps/dev?id=7737397220295288084&pli=1)
